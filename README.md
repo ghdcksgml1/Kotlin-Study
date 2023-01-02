@@ -713,3 +713,438 @@ fun main {
 </aside>
 
 [Kotlin-Study/2일차/KotlinProgramming at main · ghdcksgml1/Kotlin-Study](https://github.com/ghdcksgml1/Kotlin-Study/tree/main/2%EC%9D%BC%EC%B0%A8/KotlinProgramming)
+
+<br><br><br><br>
+
+# 📘 공부 내용정리
+
+---
+
+![스크린샷 2023-01-02 오전 9.44.01.png](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/cfa23c9d-1944-4363-b0a6-a3dad39373e3/%E1%84%89%E1%85%B3%E1%84%8F%E1%85%B3%E1%84%85%E1%85%B5%E1%86%AB%E1%84%89%E1%85%A3%E1%86%BA_2023-01-02_%E1%84%8B%E1%85%A9%E1%84%8C%E1%85%A5%E1%86%AB_9.44.01.png)
+
+1. fun 키워드로 함수 선언 시작하기
+- 모든 함수는 fun이라는 키워드로 시작한다. 덧셈 함수도 마찬가지로 함수를 선언하기 위하여 fun 키워드를 사용했다.
+1. 함수 이름 짓기
+2. 매개변수 정의하기
+- 매개변수는 쉼표(,)와 함께 여러 개를 지정할 수 있고 반드시 콜론(:)과 함께 자료형을 명시해 주어야 합니다. 덧셈 함수는 a와 b라는 매개변수를 통해 더할 값을 입력받습니다. 매개변수의 자료형은 모두 Int형으로 명시했다.
+1. 반환값의 자료형 명시하기
+- 함수가 반환하는 값이 있다면 반환값의 자료형도 반드시 명시해야 한다.
+1. 함수의 본문 완성하기
+2. 값 반환하기
+- 반환값이 없다면 이 과정은 생략 가능하다.
+
+```kotlin
+fun 함수 이름([변수 이름: 자료형, 변수 이름: 자료형..]): [반환값의 자료형] {
+	표현식..
+	[return 반환값]
+}
+```
+
+### sum( ) 함수 선언하고 호출하기
+
+```kotlin
+// sumFunc.kt
+package chap03.section1
+
+fun sum(a: Int, b: Int): Int = a + b
+
+fun main() {
+    val result1 = sum(3, 2)
+    val result2 = sum(6, 7)
+
+    println(result1)
+    println(result2)
+}
+```
+
+### 인자와 매개변수의 차이
+
+- 매개변수와 인자는 같은 역할을 하는 것처럼 보이기 때문에 착각하기 쉽다. 하지만 이 둘은 명확하게 구분할 수 있는 개념이다. 함수를 선언할 때는 매개변수라고 함수를 호출할 때는 인자라고 부른다.
+- ex) a: Int, b: Int 부분이 매개변수, sum(3, 2)에서 3, 2는 인자
+
+### 함수의 호출과 메모리
+
+```kotlin
+// MaxFunc.kt
+package chap03.section1
+
+import java.lang.Integer.max
+
+fun main() { // 최초의 스택 프레임
+    val num1 = 10
+    val num2 = 3
+    val result: Int
+
+    result = max(10, 3) // 두 번째 스택 프레임
+}
+
+fun max(a: Int, b: Int) = if (a>b) a else b
+```
+
+![스크린샷 2023-01-02 오전 10.03.20.png](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/937c47ab-9f7f-4f58-823e-f839160749b2/%E1%84%89%E1%85%B3%E1%84%8F%E1%85%B3%E1%84%85%E1%85%B5%E1%86%AB%E1%84%89%E1%85%A3%E1%86%BA_2023-01-02_%E1%84%8B%E1%85%A9%E1%84%8C%E1%85%A5%E1%86%AB_10.03.20.png)
+
+### 반환값이 없는 함수
+
+- 함수의 반환값은 생략할 수 있다. 예를 들어, 두 인자를 그대로 출력하는 함수는 값을 반환하지 않아도 된다.
+- return문은 생략할 수 있다. 그 대신 반환값의 자료형을 Unit으로 지정하거나 생략할 수 있습니다.
+
+```kotlin
+func printSum(a: Int, b: Int): Unit {
+		println("sum of $a and $b is ${a+b}")
+}
+```
+
+Unit과 void의 차이점
+
+- Unit은 자바의 void형과 대응한다. 하지만 void는 정말로 아무것도 반환하지 않고 Unit은 특수한 객체를 반환한다는 차이점이 있다.
+
+### 매개변수 제대로 활용하기
+
+- 인자가 들어오지 않았을때 default값을 지정할 수 있다.
+
+```kotlin
+fun add(name: String, email: String = "default") { }
+
+// email이 인자로 들어오지 않을 경우 email = "default"가 된다.
+// 매개변수에 기본값이 들어있지 않을 경우, 모든 인자를 채워넣어줘야 한다.
+```
+
+```kotlin
+// DefaultParameter.kt
+package chap03.section1
+
+fun main() {
+    val name = "홍길동"
+    val email = "hong@example.kr"
+
+    add(name)
+    add(name, email)
+    add("둘리", "dooly@example.kr")
+    defaultArgs()
+    defaultArgs(200)
+
+}
+
+fun add(name: String, email: String = "default") {
+    val output = "${name}님의 이메일은 ${email}입니다."
+    println(output)
+}
+
+fun defaultArgs(x: Int = 100, y: Int = 200) {
+    println(x+y)
+
+}
+```
+
+### 매개변수 이름과 함께 함수 호출하기
+
+- 매개변수가 너무 많은 함수를 호출하다 보면 매개변수의 순서가 헷갈릴 수 있다. 그래서 코틀린은 매개변수의 이름과 함께 인자를 전달하는 방법을 제공한다.
+
+```kotlin
+// NamedParam.kt
+package chap03.section1
+
+fun main() {
+    namedParam(x = 200, z = 100)
+    namedParam(z = 150) // z는 기본값을 지정하지 않았으므로 꼭 넣어줘야한다.
+
+}
+
+fun namedParam(x: Int = 100, y: Int = 200, z: Int) {
+    println(x + y + z)
+
+}
+```
+
+### 매개변수의 개수가 고정되지 않은 함수 사용하기
+
+- 가변 인자를 사용하면, 같은 역할을 하는데 매개변수만 늘어나는 함수를 한가지 기능으로 묶어줄 수 있다.
+- 변수명 앞에 vararg 키워드를 넣어준다.
+
+```kotlin
+//VarargsTest
+package chap03.section1
+
+fun main() {
+    normalVarargs(1,2,3,4)
+    normalVarargs(4,5,6)
+}
+
+fun normalVarargs(vararg counts: Int) {
+    for (num in counts) {
+        print("$num ")
+    }
+    println()
+}
+```
+
+### 함수형 프로그래밍이란?
+
+- 함수형 프로그래밍은 순수 함수를 작성하여 프로그램의 부작용을 줄이는 프로그래밍 기법
+- 순수 함수 : 함수에 같은 인자를 넣었을 때 항상 같은 결과를 반환하는 함수 **(부작용이 없는 함수),** 그리고 부작용이 없는 함수는 함수 외부의 어떤 상태도 바꾸지 않는다.
+- 순수 함수가 아닌 함수의 예
+
+```kotlin
+fun check( ) {
+		val test = User.grade( ) // check() 함수에 없는 외부의 User 객체를 사용한다.
+		if (test != null) process(test) // 변수 test는 User.grade()의 실행 결과에 따라 달라진다.
+}
+```
+
+### 람다식
+
+- 다른 함수의 인자로 넘기는 함수
+- 함수의 결괏값으로 반환하는 함수
+- 변수에 저장하는 함수
+
+```kotlin
+{x,y -> x+y}
+```
+
+### 일급 객체의 특징
+
+- 일급 객체는 함수의 인자로 전달할 수 있다.
+- 일급 객체는 함수의 반환값에 사용할 수 있다.
+- 일급 객체는 변수에 담을 수 있다.
+
+람다식의 경우 일급 객체의 특징을 가진 이름 없는 함수
+
+### 고차 함수
+
+- 다른 함수를 인자로 사용하거나 함수를 결괏값으로 반환하는 함수
+
+```kotlin
+fun main() {
+		println(highFunc({x, y -> x + y}, 10, 20)) // 람다식 함수를 인자로 넘긴다.
+}
+
+fun highFunc(sum: (Int, Int) -> Int, a: Int, b: Int): Int = sum(a,b) // sum 매개변수는 함수
+```
+
+![스크린샷 2023-01-02 오전 11.01.17.png](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/5b475845-65be-4ed4-a525-145832632513/%E1%84%89%E1%85%B3%E1%84%8F%E1%85%B3%E1%84%85%E1%85%B5%E1%86%AB%E1%84%89%E1%85%A3%E1%86%BA_2023-01-02_%E1%84%8B%E1%85%A9%E1%84%8C%E1%85%A5%E1%86%AB_11.01.17.png)
+
+### 일반 함수를 인자나 반환값으로 사용하는 고차 함수
+
+```kotlin
+// FuncArgument.kt
+package chap03.section3
+
+fun main() {
+    val res1 = sum(3, 2)
+    val res2 = mul(sum(3,3), 2)
+    
+    println("res1: $res1, res2: $res2")
+}
+
+fun sum(a: Int, b: Int) = a+b
+fun mul(a: Int, b: Int) = a*b
+```
+
+```kotlin
+// 변수에 할당하는 람다식 함수 작성하기
+// HighOrderTest
+package chap03.section3
+
+fun main() {
+    var result: Int
+    val multi = {x: Int, y:Int -> x * y}
+    result = multi(10,20)
+    println(result)
+}
+```
+
+- 람다 표현식 **(아래는 모두 같은 표현이다.)**
+
+```kotlin
+val multi: (Int, Int) -> Int = {x: Int, y: Int -> x * y} // 생략되지 않은 전체 표현
+val multi = {x: Int, y: Int -> x * y} // 선언 자료형 생략
+val multi: (Int, Int) -> Int = {x, y -> x * y}
+```
+
+- 매개변수에 람다식 함수를 이용한 고차 함수
+
+```kotlin
+// HighOrderTest2.kt
+package chap03.section3
+
+fun main() {
+    var result: Int
+    result = highOrder({x,y -> x+y}, 10, 20)
+    println(result)
+}
+
+fun highOrder(sum: (Int, Int) -> Int, a: Int, b: Int): Int {
+    return sum(a,b);
+}
+```
+
+- 인자와 반환값이 없는 람다식 함수
+
+```kotlin
+// HighOrderTest3.kt
+package chap03.section3
+
+fun main() {
+    val out: () -> Unit = {println("Hello World!")}
+
+    out()
+    val new = out
+    new()
+}
+```
+
+- 값에 의한 호출로 람다식 사용하기
+
+```kotlin
+// CallByValue.kt
+package chap03.section3
+
+fun main() {
+    val result = callByValue(lambda())
+    println(result)
+}
+
+fun callByValue(b: Boolean): Boolean {
+    println("callByValue function")
+    return b
+}
+
+val lambda: () -> Boolean = {
+    println("lambda function")
+    true
+}
+
+-- 실행 결과 --
+lambda function
+callByValue function
+true
+```
+
+- 람다식 이름을 사용해 호출하기
+
+```kotlin
+// CallByName.kt
+package chap03.section3
+
+fun main() {
+    val result = callByName(otherLambda)
+    println(result)
+}
+
+fun callByName(b: () -> Boolean): Boolean {
+    println("callByName function")
+    return b()
+}
+
+val otherLambda: () -> Boolean = {
+    println("otherLambda function")
+    true
+}
+
+-- 실행 결과 --
+callByName function
+otherLambda function
+true
+```
+
+### 다른 함수의 참조에 의한 일반 함수 호출
+
+- 람다식으로 선언한 자리에 일반 함수를 넣어주면 오류가 난다. 하지만 앞에 :: 를 붙여주면 일반함수도 람다식 자리에 넣어줄 수 있다.
+
+```kotlin
+// FunctionReference.kt
+package chap03.section3
+
+fun main() {
+    val res1 = funcParam(3, 2, ::sum2)
+    println(res1)
+    
+    hello(::text) // hello({x,y -> text(x,y)}) 과 같다.
+    
+    val likeLambda = ::sum2 // 일반 변수에 값처럼 할당할 수도 있다.
+    println(likeLambda(6,6))
+}
+
+fun sum2(a: Int, b: Int) = a+b
+
+fun text(a: String, b: String) = "Hi! $a $b"
+
+fun funcParam(a: Int, b: Int, c: (Int, Int) -> Int): Int {
+    return c(a,b)
+}
+
+fun hello(body: (String, String) -> String): Unit {
+    println(body("Hello", "World"))
+    
+}
+```
+
+- 람다식의 매개변수 테스트하기
+
+```kotlin
+// ParamCount.kt
+package chap03.section3
+
+fun main() {
+    noParam({ "Hello World!" })
+    noParam { "Hello World!" }
+}
+
+fun noParam(out: () -> String) = println(out())
+```
+
+- 2개의 람다식을 매개변수로 가진 함수의 사용
+
+```kotlin
+// TwoLambdaParam.kt
+package chap03.section3
+
+fun main() {
+    twoLambda({a,b -> "First $a $b"}, {"Second $it"})
+    twoLambda({a,b -> "First $a $b"}) {"Second $it"}
+}
+
+fun twoLambda(first: (String, String) -> String,
+    second: (String) -> String) {
+    println(first("OneParam", "TwoParam"))
+    println(second("OneParam"))
+}
+```
+
+# 💡 질문 2개 만들기
+
+---
+
+1. 아래와 같이 정의된 람다식 안에 함수 sum을 넣으려면 어떻게 해야하는가?
+
+```kotlin
+fun main() {
+		println(customFunc([빈칸], 10, 20))
+}
+
+fun customFunc(first: (Int, Int) -> Int, a: Int, b: Int): Int {
+ 		return first(a,b)
+}
+
+fun sum(a: Int, b: Int) = a + b
+
+-- 실행 결과 --
+30
+```
+
+1. 다음 람다식 중 잘못된 람다식은 ?? (p.121 참고)
+    1. val lambda = {a: String, b: String → “$a $b”}
+    2. val lambda: (String, String) → String = {”$a $b”}
+    3. val lambda: (String, String) → String = {a: String, b: String → “$a $b”}
+
+---
+
+<aside>
+✅ 체크 리스트
+
+- [x]  2시간 이상 공부하셨나요?
+- [x]  내용을 정확히 이해했나요?
+- [x]  코드에 주석은 달았나요?
+</aside>
+
+[Kotlin-Study/3일차/KotlinProgramming/src/chap03 at main · ghdcksgml1/Kotlin-Study](https://github.com/ghdcksgml1/Kotlin-Study/tree/main/3%EC%9D%BC%EC%B0%A8/KotlinProgramming/src/chap03)
