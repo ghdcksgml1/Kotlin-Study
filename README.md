@@ -1148,3 +1148,351 @@ fun sum(a: Int, b: Int) = a + b
 </aside>
 
 [Kotlin-Study/3일차/KotlinProgramming/src/chap03 at main · ghdcksgml1/Kotlin-Study](https://github.com/ghdcksgml1/Kotlin-Study/tree/main/3%EC%9D%BC%EC%B0%A8/KotlinProgramming/src/chap03)
+
+# 📘 공부 내용정리 - 4일차
+
+---
+
+### 고차 함수와 람다식의 사례 알아보기
+
+```kotlin
+fun <T> lock(reLock: ReentrantLock, body: ()->T): T {
+		reLock.lock() // 잠그고 들어가기
+		try{
+				return body() // body 함수 실행
+		}finally {
+				reLock.unlock() // 열고 나오기
+		}
+}
+```
+
+- 공유자원을 접근하는 코드 보호하기
+
+```kotlin
+// LockHighOrder.kt
+package chap03.section4
+
+import java.util.concurrent.locks.ReentrantLock
+
+var sharable = 1 // 보호가 필요한 공유 자원
+
+fun main() {
+    val reLock = ReentrantLock()
+    lock(reLock, ::criticalFunc)
+    lock(reLock, ::criticalFunc)
+    lock(reLock, ::criticalFunc)
+
+    println(sharable)
+}
+
+fun criticalFunc() {
+		// 공유 자원 접근 코드 사용
+    sharable += 1
+}
+
+fun <T> lock(reLock: ReentrantLock, body: ()->T): T{
+    reLock.lock()
+    try {
+        return body()
+    }finally {
+        reLock.unlock()
+    }
+
+}
+```
+
+### 네트워크 호출 구현
+
+- 콜백 함수 : 특정 이벤트가 발생하기까지 처리되지 않다가 이벤트가 발생하면 즉시 호출되어 처리되는 함수를 말한다.
+
+// 생략
+
+## 코틀린의 다양한 함수 알아보기
+
+### 익명 함수
+
+- 익명 함수란 일반 함수이지만 이름이 없는 것이다.
+
+```kotlin
+fun(x: Int, y:Int): Int = x + y // fun만 존재하고 이름이 없다
+
+// 아래와 같이 변수 선언에 그대로 사용할 수 있다.
+val add: (Int, Int) -> Int = fun(x,y) = x + y
+val result = add(10,2)
+```
+
+- 익명함수를 사용하는 이유는? - 람다식에서 return이나 break, continue처럼 제어문을 사용하기 어렵기 때문이다. 함수 본문 조건식에 따라 함수를 중단하고 반환해야 하는 경우에는 익명 함수를 사용해야 한다.
+
+### 인라인 함수
+
+- 인라인 함수는 이 함수가 호출되는 곳에 함수 본문의 내용을 모두 복사해 넣어 함수의 분기 없이 처리되기 때문에 코드의 성능을 높일 수 있다.
+- 인라인 함수는 코드가 복사되기 때문에 내용은 대게 짧게 작성한다.`
+    
+    ![스크린샷 2023-01-03 오후 12.01.24.png](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/3ff7e1be-ee3c-4e6f-af87-df9eaaef1ef7/%E1%84%89%E1%85%B3%E1%84%8F%E1%85%B3%E1%84%85%E1%85%B5%E1%86%AB%E1%84%89%E1%85%A3%E1%86%BA_2023-01-03_%E1%84%8B%E1%85%A9%E1%84%92%E1%85%AE_12.01.24.png)
+    
+
+```kotlin
+// InlineFunction.kt
+package chap03.section5
+
+fun main() {
+    shortFunc(3) { println("First call : $it") }
+    shortFunc(5) { println("Second call : $it") }
+}
+
+inline fun shortFunc(a: Int, out: (Int) -> Unit) {
+    println("Before calling out()")
+    out(a)
+    println("After calling out()")
+
+}
+// 일반 함수와 같은 동작을 할 것 처럼 보이지만, 역컴파일 해보면
+public static final void main() {
+      int a$iv = 3;
+      int $i$f$shortFunc = false;
+      String var2 = "Before calling out()";
+      System.out.println(var2);
+      int var4 = false;
+      String var5 = "First call : " + a$iv;
+      System.out.println(var5);
+      var2 = "After calling out()";
+      System.out.println(var2);
+      a$iv = 5;
+      $i$f$shortFunc = false;
+      var2 = "Before calling out()";
+      System.out.println(var2);
+      var4 = false;
+      var5 = "Second call : " + a$iv;
+      System.out.println(var5);
+      var2 = "After calling out()";
+      System.out.println(var2);
+   }
+
+// 다음과 같이 2회 복사가 이루어진 것을 볼 수 있다.
+```
+
+### 인라인 함수 제한하기
+
+- 인라인 함수의 매개변수로 사용한 람다식의 코드가 너무 길거나 인라인 함수의 본문 자체가 너무 길면 컴파일러에서 성능 경고를 할 수 있다.
+- 또한, 인라인 함수가 너무 많이 호출되면 오히려 코드 양만 늘어나서 좋지 않을 수도 있다.
+
+```kotlin
+// inline함수에 람다식이 들어가는 예
+inline fun sub(out1: () -> Unit, out2: () -> Unit) [
+
+// out1과 out2에 람다식이 그대로 복사되므로 코드의 양이 많아진다.
+
+// 이를 해결하기 위해서 적절한 곳에 noinline을 사용하면 코드를 복사하는
+// 것이 아닌 분기하여 호출된다.
+inline fun sub(out1: () -> Unit, noinline out2: () -> Unit) {
+```
+
+- noline으로 람다식의 인라인 막기
+
+```kotlin
+package chap03.section5
+
+fun main() {
+    shortFunc2(3) { println("First call: $it") }
+}
+
+inline fun shortFunc2(a: Int, noinline out: (Int) -> Unit) {
+    println("Before calling out()")
+    out(a)
+    println("After calling out()")
+}
+```
+
+위 코드의 람다식 부분은 inline으로 복사되는 것이 아닌 분기처리가 됩니다.
+
+### 인라인 함수와 비지역 반환
+
+- 코트린에서는 익명 함수를 종료하기 위해서 return을 사용할 수 있다. 이때 특정 반환값 없이 return만 사용해야한다.
+
+```kotlin
+// LocalReturn.kt
+package chap03.section5
+
+fun main() {
+    shortFun3(3) {
+        println("First call: $it")
+        return
+    }
+
+    println("Hi")
+}
+
+inline fun shortFun3(a: Int, out: (Int) -> Unit) {
+    println("Before calling out()")
+    out(a)
+    println("After calling out()")
+}
+// Hi, After calling out()은 출력되지 않는다.
+```
+
+람다식 함수에서 return문을 만났지만 의도하지 않게 바깥의 함수인 shortFunc3( )가 반환 처리되었다. main( )도 마찬가지
+
+해석 : 생각을 해보자 inline 키워드면, 위 코드에서 main( )함수에 shortFun3함수가 복사되어 들어있는거고, shortFun3의 매개변수 out도 inline이 적용되기 때문에 람다식도 분기처리가 아닌 복사가 되어있을 것이다. 따라서 return은 현재 main함수 안에 정의 되어있는 것이나 마찬가지이므로, return을 만나게 될 시 main함수에서 빠져나오게 되어 그 아래 모든 작업이 실행되지 않는 것이다.
+
+### crossinline으로 비지역 반환 금지하기
+
+- crossinline 키워드는 비지역 반환을 금지하는 람다식에 사용한다.
+- 문맥이 달라져 인라인이 되지 않는 중첩된 람다식 함수는 return을 금지해야 한다. 따라서 crossinline을 사용하면 람다식에서 return문이 사용되었을 때 코드 작성 단계에서 오류를 보여줘 잘못된 비지역 반환을 방지할 수 있다.
+
+```kotlin
+// LocalReturnCrossinline.kt
+package chap03.section5
+
+fun main() {
+    shortFunc4(3) {
+        println("First call: $it")
+        return@shortFunc4
+    }
+}
+
+inline fun shortFunc4(a: Int, crossinline out: (Int) -> Unit) {
+    println("Before calling out()")
+    nestedFunc { out(a) }
+    println("After calling out()")
+
+}
+
+fun nestedFunc(body: () -> Unit) {
+    body()
+
+}
+```
+
+### String 클래스에 나만의 확장 함수 추가하기
+
+```kotlin
+// ExtensionFunction.kt
+package chap03.section5
+
+fun main() {
+    val source = "Hello World!"
+    val target = "Kotlin"
+    println(source.getLongString(target))
+}
+
+// String 클래스를 확장해 getLongString() 함수 추가
+fun String.getLongString(target: String): String =
+    if(this.length > target.length) this else target
+```
+
+확장 대상에 기존에 없는 새로운 멤버 메서드를 만들었다.
+
+이렇게 확장 함수 기법을 사용하면 기존 클래스의 선언 구현부를 수정하지 않고 외부에서 손쉽게 기능을 확장할 수 있다.
+
+만약, 확장 함수를 만들 때 확장하려는 대상에 동일한 이름의 멤버 함수 혹은 메서드가 존재한다면 항상 확장 함수보다 멤버 메서드가 우선으로 호출된다.
+
+### 중위 함수
+
+- 중위 표현법이란 클래스의 멤버를 호출할 때 사용하는 점(.)을 생략하고 함수 이름 뒤에 소괄호를 붙이지 않아 직관적인 이름을 사용할 수 있는 표현법
+
+### 중위 함수의 조건
+
+- 멤버 메서드 또는 확장 함수여야 한다.
+- 하나의 매개변수를 가져야 한다.
+- infix 키워드를 사용하여 정의한다.
+
+```kotlin
+// InfixFunction.kt
+package chap03.section5
+
+fun main() {
+    val multi = 3 multiply 10
+    println("multi: $multi")
+}
+
+infix fun Int.multiply(x: Int): Int {
+    return this * x
+}
+```
+
+## 꼬리 재귀 함수
+
+- 재귀 함수 : 자기 자신을 다시 참조하는 방법
+
+### 재귀 함수의 조건
+
+- 무한 호출에 빠지지 않도록 탈출 조건을 만들어 둔다.
+- 스택 영역을 이용하므로 호출 횟수를 무리하게 많이 지정해 연산하지 않는다.
+- 코드를 복잡하지 않게 한다.
+
+코틀린에서는 꼬리 재귀 함수를 통해 스택 오버플로 현상을 해결할 수 있다.
+
+이 방식은 스택에 계속  쌓이는 방식이 아닌 꼬리를 무는 형태로 반복한다.
+
+```kotlin
+// 일반적인 팩토리얼 재귀함수
+package chap03.section5
+
+fun main() {
+    val number = 4
+    val result: Long
+
+    result = factorial(number)
+    println("Factorial: $number -> $result")
+}
+
+fun factorial(n: Int): Long {
+    return if(n == 1) n.toLong() else n* factorial(n-1)
+
+}
+
+// 꼬리 재귀를 이용한 팩토리얼
+package chap03.section5
+
+fun main() {
+    val number = 5
+    println("Factorial: $number -> ${factorial(number)}")
+}
+
+tailrec fun factorial(n: Int, run: Int = 1): Long {
+    return if(n == 1) run.toLong() else factorial(n-1, run*n)
+
+}
+// factorial(n-1, run*n)은 인자 안에서 팩토리얼의 도중 값을 계산하고 호출한다. 
+// 꼬리 재귀를 사용하면 팩토리얼의 값을 그때그때 계산하므로 스택 메모리를 낭비하지 않아도 된다.
+
+```
+
+# 💡 질문 2개 만들기
+
+---
+
+1. 아래 코드에서 “Hi”와 “After calling out()”이 출력되지 않는 이유를 자세하게 설명하시오.
+
+```kotlin
+// LocalReturn.kt
+package chap03.section5
+
+fun main() {
+    shortFun3(3) {
+        println("First call: $it")
+        return
+    }
+
+    println("Hi")
+}
+
+inline fun shortFun3(a: Int, out: (Int) -> Unit) {
+    println("Before calling out()")
+    out(a)
+    println("After calling out()")
+}
+// Hi, After calling out()은 출력되지 않는다.
+```
+
+---
+
+<aside>
+✅ 체크 리스트
+
+- [x]  2시간 이상 공부하셨나요?
+- [x]  내용을 정확히 이해했나요?
+- [x]  코드에 주석은 달았나요?
+</aside>
+
+[Kotlin-Study/4일차 at main · ghdcksgml1/Kotlin-Study](https://github.com/ghdcksgml1/Kotlin-Study/tree/main/4%EC%9D%BC%EC%B0%A8)
