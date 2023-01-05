@@ -1496,3 +1496,612 @@ inline fun shortFun3(a: Int, out: (Int) -> Unit) {
 </aside>
 
 [Kotlin-Study/4일차 at main · ghdcksgml1/Kotlin-Study](https://github.com/ghdcksgml1/Kotlin-Study/tree/main/4%EC%9D%BC%EC%B0%A8)
+
+<br><br><br><br>
+
+# 📘 공부 내용정리 - 6일차
+
+---
+
+### if문과 if~else문
+
+- if문은 조건을 판단하기 위해 자주 사용한다.
+
+```kotlin
+if (조건식) {
+		수행할 문장 // 조건식이 true인 경우에만 수행
+		...
+}
+```
+
+- 조건식이 false일 경우 수행하고자 하는 문장이 있다면 else문의 블록에 코드를 작성하면 된다.
+
+```kotlin
+if (조건식) {
+		수행할 문장 // 조건식이 true인 경우에만 수행
+} else {
+		수행할 문장 // 조건식이 false인 경우에만 수행
+}
+```
+
+### 블록의 표현식이 길어지면 중괄호로 감사야한다.
+
+```kotlin
+// IfCondition.kt
+package chap04.section1
+
+fun main() {
+    val a = 12
+    val b = 7
+
+    val max = if (a > b) {
+        println("a 선택")
+        a // 마지막 식인 a가 반환되어 max에 할당
+    } else {
+        println("b 선택")
+        b // 마지막 식인 b가 반환되어 max에 할당
+    }
+
+    println(max)
+}
+```
+
+### else if문을 여러 번 사용하면 여러 조건을 판별할 수 있다.
+
+```kotlin
+//IfElseIfCondition.kt
+package chap04.section1
+
+fun main() {
+    print("Enter the score: ")
+    val score = readLine()!!.toDouble() // 콘솔로부터 입력받음
+    var grade: Char = 'F'
+
+    if(score >= 90.0) {
+        grade = 'A'
+    } else if (score >= 80.0 && score <= 89.9) {
+        grade = 'B'
+    } else if (score >= 70.0 && score <= 79.9) {
+        grade = 'C'
+    }
+
+    println("Score: $score, Grade: $grade")
+}
+```
+
+- 위 코드의 readLine()을 보면, 문자열을 입력받는다. 그 뒤에 toDouble( )을 추가로 호출해 Double형으로 변환한다. 하지만 진짜 문자열 “apple”과 같은 문자가 들어온다면 실수로 변환시키지 못해 예외가 발생할 수 있다. 따라서, null을 검사하거나 단정기호(!!)를 사용해 받아들일 수 있다. 단정 기호의 경우 null이 들어왔을때 예외가 발생할 수 있으므로 주의해야 한다.
+
+### in 연산자와 범위 연산자로 조건식 간략하게 만들기
+
+```kotlin
+} else if (score >= 80.0 && score <= 89.9) {
+
+// 위와 같은 조건문을 아래와 같이 간략하게 만들 수 있다
+} else if (score in 80.0 .. 89.9) {
+```
+
+### when문으로 다양한 조건 처리하기 (switch를 쉽게만든거라고 생각)
+
+- 조건이 아주 많아지면 이렇게 If문, else if문, in 연산자, 범위 연산자를 사용해도 코드의 양을 줄일 수 없다.
+- when문을 이용하면 이렇게 조건이 많은 코드를 간략하게 줄일 수 있다.
+
+```kotlin
+when (x) {
+		1 -> print("x == 1") // 1일경우
+		2 -> print("x == 2") // 2일경우
+		else -> { // 블록 사용가능
+				print("x는 1,2가 아닙니다.")
+		}
+}
+```
+
+- switch~case문과 비슷하지만 각 수행 문장을 멈추는 break와 같은 문장이 필요하지 않다.
+- 일치되는 조건을 한번에 여러 개 표현하려면 쉼표(,)를 이용할 수 있다.
+
+```kotlin
+when (x) {
+		0,1 -> print("x == 0 or x == 1")
+		else -> print("기타")
+}
+```
+
+### when문에 함수의 반환값 사용하기
+
+```kotlin
+when (x) {
+		parseInt(s) -> print("일치함!")
+		else -> print("기타")
+}
+```
+
+### when문에 in 연산자와 범위 지정자 사용하기
+
+```kotlin
+when (x) {
+		in 1..10 -> print("x는 1 이상 10 이하입니다.")
+		!in 1..10 -> print("x는 10이상 20이하의 범위에 포함되지 않습니다.") // 해당범위 이외의 요소를 가리킴
+		else -> print("x는 어떤 범위에도 없습니다.")
+}
+```
+
+### when문을 이용해 점수 등급 구하기
+
+```kotlin
+// WhenArgs.kt
+package chap04.section1
+
+fun main() {
+    print("Enter the score: ")
+    val score = readLine()!!.toDouble()
+    var grade: Char = 'F'
+
+    when(score) {
+        in 90.0 .. 100.0 -> grade = 'A'
+        in 80.0 .. 89.9 -> grade = 'B'
+        in 70.0 .. 79.9 -> grade = 'C'
+        !in 70.0 .. 100.0 -> grade = 'F'
+
+    }
+
+    println("Score: $score, Grade: $grade")
+}
+```
+
+### 인자가 없는 when문 사용하기
+
+```kotlin
+// WhenNoArgs.kt
+package chap04.section1
+
+fun main() {
+    print("Enter the score: ")
+    val score = readLine()!!.toDouble()
+    var grade: Char = 'F'
+
+    when {
+        score >= 90.0 -> grade = 'A' // 인자 있는 when문과 다르게 조건식을 구성할 수 있음
+        score in 80.0 .. 89.9 -> grade = 'B'
+        score in 70.0 .. 79.9 -> grade = 'C'
+        else -> grade = 'F'
+    }
+    println("Score: $score, Grade: $grade")
+}
+```
+
+### 다양한 자료형의 인자 받기
+
+```kotlin
+// WhenAnyCase.kt
+package chap04.section1
+
+fun main() {
+    cases("Hello") // String형
+    cases(1) // Int형
+    cases(System.currentTimeMillis()) // 현재 시간(밀리초 단위)을 Long형 값으로 반환
+}
+
+fun cases(obj: Any) {
+    when (obj) {
+        1 -> println("Int: $obj")
+        "Hello" -> println("String: $obj")
+        is Long -> println("Long: $obj")
+        !is String -> println("Not a String")
+        else -> println("Unknown")
+    }
+}
+```
+
+## 반복문
+
+### for문
+
+- for문은 변수를 선언하고 조건식에 따라 변수 값을 반복해서 증감하는 구문이다.
+- 코틀린에서는 세미콜론을 사용할 수 없기 때문에 주의해야 한다.
+
+```kotlin
+for ( 요소 변수 in 컬렉션 또는 범위 ) { 반복할 본문 }
+```
+
+- 1부터 10까지 더하기
+
+```kotlin
+// ForSum.kt
+package chap04.section2
+
+fun main() {
+    var sum = 0
+
+    for (x in 1..10) sum += x // 1부터 10까지 더한다.
+    println("sum: $sum")
+}
+```
+
+### 하행, 상행 및 다양한 반복 방법
+
+```kotlin
+// 하행
+for (i in 5 downTo 1) print(i)
+-- 실행결과 --
+54321
+
+// 숫자를 2씩 증가시켜 출력하기
+for (i in 1..5 step 2) print(i)
+-- 실행결과 --
+135
+```
+
+### 반복문을 이용해 삼각형 출력하기
+
+```kotlin
+// ForTriangle.kt
+package chap04.section2
+
+fun main() {
+    print("Enter the lines: ")
+    val n = readLine()!!.toInt()
+
+    for (line in 1..n) {
+        for (space in 1..(n - line)) print(" ")
+        for (star in 1..(2 * line - 1)) print("*")
+        println()
+    }
+}
+-- 실행결과 -- 
+Enter the lines: 5
+    *
+   ***
+  *****
+ *******
+*********
+```
+
+### 짝수의 합과 홀수의 합 구하기
+
+```kotlin
+// ForOddSum.kt
+package chap04.section2
+
+fun main() {
+    var total: Int = 0
+    for (num in 1..100 step 2) total += num
+    println("Odd total: $total")
+
+    for (num in 0..99 step 2) total += num
+    println("Even total: $total")
+}
+```
+
+### while문
+
+- while문은 조건식이 true를 만족하는 경우 while문의 블록을 무한히 반복한다.
+- 조건식이 false가 되면 실행문이 중단되어 while 루프를 빠져나간다.
+
+### while문으로 팩토리얼 계산하기
+
+```kotlin
+// WhileFactorial.kt
+package chap04.section2
+
+fun main() {
+    print("Enter the number: ")
+    var number = readLine()!!.toInt()
+    var factorial: Long = 1
+
+    while(number > 0) { // number = number x (number - 1) x (number - 2)
+        factorial *= number
+        --number
+    }
+
+    println("Factorial: $factorial")
+}
+```
+
+### do~while문
+
+- 앞에서 배운 while문에서는 조건식을 먼저 검사한 후 반복을 진행하기 때문에 처음부터 조건식이 false인 경우 작업이 한 번도 실행되지 않는다. 그러나 do~while문의 경우 일단 do 블록에 작성한 본문을 한 번은 실행 한 다음 마지막에 조건식을 검사해서 true가 나오면 작업을 반복한다.
+
+```kotlin
+do {
+	본문
+} while (조건식)
+```
+
+- do~while문 사용해 보기
+
+```kotlin
+// DoWhileLoop.kt
+package chap04.section2
+
+fun main() {
+    do {
+        print("Enter an Integer: ")
+        val input = readLine()!!.toInt()
+
+        for (i in 0..(input-1)) {
+            for (j in 0..(input-1)) print((i+j) % input + 1)
+            println()
+        }
+
+    } while (input != 0)
+}
+```
+
+## 흐름의 중단과 반환
+
+- 조건문이나 반복문을 사용할 때 수행 중이던 코드를 바로 중단하거나 조건식으로 되돌아가도록 프로그램을 작성해야 하는 경우도 있다.
+
+### 흐름 제어문
+
+- return : 함수에서 결괏값을 반환하거나 지정된 라벨로 이동한다.
+- break : for문이나 while문의 조건식에 상관없이 반복문을 끝낸다.
+- continue : for문이나 while문의 본문을 모두 수행하지 않고 다시 조건식으로 넘어간다.
+
+### 예외 처리문
+
+- try {…} catch {…} : try 블록의 본문을 수행하는 도중 예외가 발생하면 catch 블록의 본문을 실행한다.
+- try {…} catch {…} finally {…} : 예외가 발생해도 finally 블록 본문은 항상 실행한다.
+
+### return문
+
+- 보통 return 문은 값을 반환하는데 사용한다.
+
+### 람다식에서 return 사용하기
+
+- inline으로 선언되지 않은 람다식에서는 return을 그냥 사용할 수 없다. 따라서 return@label과 같이 라벨 표기와 함께 사용해야 한다.
+
+```kotlin
+// InlineLambdaReturn.kt
+package chap04.section3
+
+fun main() {
+    retFunc()
+}
+
+inline fun inlineLambda(a: Int, b: Int, out: (Int, Int) -> Unit) {
+    out(a,b)
+
+}
+
+fun retFunc() {
+    println("start of retFunc")
+    inlineLambda(13,3) {
+        a,b ->
+        val result = a + b
+        if (result > 10) return
+        println("result: $result") // result가 10보다 크면 도달하지 못하는 부분
+
+    }
+    println("end of retFunc") // result가 10보다 크면 도달하지 못하는 부분
+
+}
+```
+
+- 위 코드를 보면, result의 결과에 상관없이 end of retFunc를 출력하도록 설계한 것 처럼 보인다. 하지만 inline함수이기 때문에 retFunc에서 return을 하는 것이나 마찬가지이기 때문에 println(”end of retFunc”)에 도달할 수 없다. **(비지역 반환이라고 함)**
+- 이를 방지하기 위해 람다식에 라벨과 함께 return을 사용하면 해결된다.
+
+### 람다식에서 라벨과 함께 return 사용하기
+
+- 비지역 반환을 방지하고 가장 가까운 함수 위치로 빠져 나가도록 하는 방법
+
+```kotlin
+람다식함수이름 라벨이름@ {
+		...
+		return@라벨 이름
+}
+
+// NoInlineLambdaReturn.kt
+package chap04.section3
+
+fun main() {
+    retFunc2()
+}
+
+fun inlineLambda2(a: Int, b: Int, out: (Int, Int) -> Unit) {
+    out(a,b)
+}
+
+fun retFunc2() {
+    println("start of retFunc")
+    inlineLambda2(13,3) lit@{ a, b ->
+        val result = a + b
+        if(result > 10) return@lit
+        println("result : $result")
+    }
+    println("end of retFunc")
+}
+
+-- 실행결과 --
+start of retFunc
+end of retFunc
+```
+
+### 암묵적 라벨
+
+- 람다식 표현식 블록에 직접 라벨을 쓰는 것이 아닌 람다식의 명칭을 그대로 라벨처럼 사용할 수 있다. 이것을 암묵적 라벨이라 부른다.
+
+```kotlin
+...
+fun retFunc( ) {
+		println("start of retFunc")
+		inlineLambda(13,3) { a, b -> 
+				val result = a + b
+				if(result > 10) return@inlineLambda
+				println("result: $result")
+		}
+		println("end of retFunc")
+}
+...
+```
+
+### 익명 함수를 사용한 반환
+
+- 람다식 대신에 익명 함수를 넣을 수도 있다. 이때는 라벨을 사용하지 않고도 가까운 익명 함수 자체가 반환되므로, 라벨로 return 했을 때와 동일한 결과를 가질 수 있다.
+
+```kotlin
+fun retFunc( ) {
+		println("start of retFunc")
+		inlineLambda(13,3, fun(a,b) {
+				val result = a + b
+				if(result > 10) return
+				println("result: $result")
+		}) // inlineLambda( )의 끝부분
+		println("end of retFunc")
+}
+```
+
+### break문과 continue문
+
+```kotlin
+
+// NormalBreakContinue.kt
+package chap04.section3
+
+fun main() {
+    for(i in 1..5) {
+        if(i == 3) break
+        print(i)
+    }
+    println() // 개행문자
+    println("outside")
+}
+-- 실행결과 --
+12
+
+package chap04.section3
+
+fun main() {
+    for(i in 1..5) {
+        if(i == 3) continue
+        print(i)
+    }
+    println() // 개행문자
+    println("outside")
+}
+-- 실행결과 --
+1245
+```
+
+### 코틀린에서는 라벨을 통해 중단되는 위치를 바꿀 수 있다.
+
+```kotlin
+fun labelBreak() {
+		println("labelBreak")
+		for(i in 1..5) {
+				second@ for (j in 1..5) {
+						if( j == 3) break@second
+						println("i: $i, j: $j")
+				}
+				println("after for j")
+		}
+		println("after for i")
+}
+```
+
+### 예외 처리
+
+- 프로그램 코드를 작성하다 보면 해당 코드가 제대로 작동하지 못하고 중단되는 현상이 발생할 수 있다.
+- 대부분의 오류는 코드를 작성하는 도중에 컴파일러가 잡아낼 수 있지만, 메모리 부족이나 파일이 손상되는 등의 실행 도중의 잠재적인 오류까지 검사할 수 없기 때문에 예외 처리가 필요하다.
+- 잠재적으로 예외가 발생할 수 있는 코드를 try~catch문으로 감싸 놓으면 try 블록에서 예외가 발생하면 catch 블록에서 잡아서 그 예외를 처리한다.
+
+```kotlin
+try {
+		예외 발생 가능성이 있는 문장
+} catch (e: 에외 처리 클래스 이름) {
+		예외를 처리하기 위한 문장
+} finally {
+		반드시 실행되어야 하는 문장
+}
+```
+
+```kotlin
+// TryCatch.kt
+package chap04.section3
+
+import java.lang.Exception
+
+fun main() {
+    val a = 6
+    val b = 0
+    val c : Int
+
+    try {
+        c = a/b // 0으로 나눔
+    } catch (e : Exception) {
+        println("Exception is handled.")
+
+    } finally {
+        println("finally 블록은 반드시 항상 실행됨.")
+    }
+}
+```
+
+### 예외 발생시키기
+
+- 지금까지 시스템의 예외를 처리하는 데 중점을 두었지만, 이번에는 예외를 직접 발생시켜보자.
+
+```kotlin
+// ThrowExceptionTest.kt
+package chap04.section3
+
+import java.lang.Exception
+
+fun main() {
+    var amount = 600
+
+    try {
+        amount -= 100
+        checkAmount(amount)
+    } catch (e: Exception) {
+        println(e.message)
+
+    }
+    println("amount: $amount")
+}
+
+fun checkAmount(amount: Int) {
+    if(amount < 1000)
+        throw Exception("잔고가 $amount 으로 1000 미만 입니다.")
+
+}
+```
+
+### 사용자 예외 클래스 만들어 보기
+
+```kotlin
+// CustomExceptionTest.kt
+package chap04.section3
+
+import java.lang.Exception
+
+class InvalidNameException(message: String) : Exception(message)
+
+fun main() {
+    var name = "Kildong123" // 숫자가 포함된 이름
+    try {
+        validateName(name)
+    } catch (e : InvalidNameException) {
+        println(e.message)
+    } catch (e : Exception) {
+        println(e.message)
+    }
+}
+
+fun validateName(name : String) {
+    if(name.matches(Regex(".*\\d+/*"))) { // 이름에 숫자가 포함되어 있으면 예외 발생
+        throw InvalidNameException("Your name : $name : contains numerals.")
+    }
+
+}
+```
+
+
+
+<aside>
+✅ 체크 리스트
+
+- [x]  2시간 이상 공부하셨나요?
+- [x]  내용을 정확히 이해했나요?
+- [x]  코드에 주석은 달았나요?
+</aside>
+
+[Kotlin-Study/6일차 at main · ghdcksgml1/Kotlin-Study](https://github.com/ghdcksgml1/Kotlin-Study/tree/main/6%EC%9D%BC%EC%B0%A8)
