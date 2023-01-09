@@ -2566,3 +2566,649 @@ fun main() {
 </aside>
 
 [Kotlin-Study/7일차 at main · ghdcksgml1/Kotlin-Study](https://github.com/ghdcksgml1/Kotlin-Study/tree/main/7%EC%9D%BC%EC%B0%A8)
+
+<br><br><br><br><br><br><br><br>
+
+# 📘 공부 내용정리 - 8일차
+
+---
+
+## super와 this의 참조
+
+클래스를 상위와 하위 클래스로 설계하다 보면 때로는 상위와 현재 클래스의 특정 메서드나 프로퍼티, 생성자를 참조해야 하는 경우가 생긴다. 상위 클래스는 super 키워드로, 현재 클래스는 this 키워드로 참조가 가능하다.
+
+| super | this |
+| --- | --- |
+| super.프로퍼티 이름 // 상위 클래스의 프로퍼티 참조 | this.프로퍼티 이름 // 현재 클래스의 프로퍼티 참조 |
+| super.메서드 이름( ) // 상위 클래스의 메서드 참조 | this.메서드 이름( ) // 현재 클래스의 메서드 참조 |
+| super( ) // 상위 클래스의 생성자 참조 | this( ) // 현재 클래스의 생성자 참조 |
+
+### super로 상위 객체 참조하기
+
+- 메서드를 오버라이딩하려고 할 때 만일 상위 클래스에서 구현한 내용을 그대로 사용하고 거기에 필요한 내용만 추가하려고 할 때, 상위 클래스를 가리키는 특별한 키워드인 **super**를 사용한다.
+
+```kotlin
+open class Bird(var name: String, var wing: Int, var beak: String, var color: String) {
+		fun fly( ) = println("Fly wing: $wing")
+		open fun sing(vol: Int) = println("Sing vol: $vol")
+}
+
+class Parrot(name: String, wing: Int = 2, beak: String, color: String,
+						var language: String = "natural") : Bird(name, wing, beak, color) {
+		fun speak( ) = println("Speak! $language")
+
+		override fun sing(vol: Int){
+				super.sing(vol) // 상위 클래스의 sing()을 먼저 수행
+				println("I'm a parrot! The volume level is $vol")
+				speak()
+		}
+}
+```
+
+```kotlin
+// PersonThisSuper.kt
+package chap05.section4.personthis
+
+open class Person{
+    constructor(firstName: String){
+        println("[Person] firstName: $firstName")
+    }
+
+    constructor(firstName: String, age: Int) { // 3번
+        println("[Person] firstName: $firstName, $age")
+    }
+}
+
+class Developer : Person { // Person과 상속관계
+    constructor(firstName: String): this(firstName, 10) { // 1번
+        println("[Developer] $firstName")
+
+    }
+
+    constructor(firstName: String, age: Int): super(firstName, age) { // 2번
+        println("[Developer] $firstName, $age")
+
+    }
+
+}
+
+fun main() {
+    val scan = Developer("Sean")
+}
+```
+
+### 주 생성자와 부 생성자 함께 사용하기
+
+- 초기화 되는 순서 = 1번 부 생성자 호출 →2번 주 생성자 호출 → 3번 프로퍼티 할당 → 4번 초기화 블록
+→ 5번 부 생성자의 본문 실행
+
+```kotlin
+// PersonPriSeconRef.kt
+package chap05.section4.prisecon
+
+class Person(firstName: String,
+            out: Unit = println("[Primary Constructor] Parameter")) { // 2. 주 생성자
+    val fName = println("[Property] Person fName: $firstName")  // 3. 프로퍼티 할당
+
+    init {
+        println("[init] Person init block") // 4. 초기화 블록
+    }
+
+    // 1. 부 생성자
+    constructor(firstName: String, age: Int,
+                out: Unit = println("[Secondary Constructor] Parameter")) : this(firstName) {
+                    println("[Secondary Constructor] Body: $firstName, $age") // 5. 부 생성자 본문
+    }
+}
+
+fun main() {
+    val p1 = Person("Kildong", 30) // 1->2호출 3->4->5 실행
+    println()
+    val p2 = Person("Dooly") // 2호출, 3->4 실행
+}
+
+-- 실행 결과 --
+[Secondary Constructor] Parameter
+[Primary Constructor] Parameter
+[Property] Person fName: Kildong
+[init] Person init block
+[Secondary Constructor] Body: Kildong, 30
+
+[Primary Constructor] Parameter
+[Property] Person fName: Dooly
+[init] Person init block
+```
+
+### 바깥 클래스 호출하기
+
+- 클래스를 선언할 때 클래스 안에 다시 클래스를 선언하는 것이 가능하다.
+- 특정 클래스 안에 선언 클래스를 이너 클래스(Inner class)라고 한다.
+
+```kotlin
+// InnerClassRef.kt
+package chap05.section4.innerref
+
+open class Base {
+    open val x: Int = 1
+    open fun f() = println("Base Class f( )")
+}
+
+class Child : Base() {
+    override val x: Int = super.x + 1
+    override fun f() = println("Child Class f( )")
+
+    //////////////////////// 이너 클래스 /////////////////////////
+    inner class Inside {
+        fun f() = println("Inside Class f( )")
+        fun test() {
+            f() // 1. 현재 이너 클래스의 f() 접근
+            Child().f() // 2. 바로 바깥 클래스 f() 접근
+            super@Child.f() // 3. Child의 상위 클래스인 Base 클래스의 f() 접근
+            println("[Inside] super@Child.x: ${super@Child.x}") // 4. Base의 x 접근
+        }
+    }
+    /////////////////////////////////////////////////////////
+}
+
+fun main() {
+    val c1 = Child()
+    c1.Inside().test() // 이너 클래스 Inside의 메서드 test() 실행
+}
+
+-- 실행결과 --
+Inside Class f( )
+Child Class f( )
+Base Class f( )
+[Inside] super@Child.x: 1
+```
+
+c1.Inside( ).test( )를 보면 Child 클래스 안에 선언된 Inside 클래스를 생성하고  Inside의 메서드인 test( ) 메서드를 호출하고 있다.
+
+### 인터페이스 참조하기
+
+- 인터페이스는 일종의 구현 약속으로 인터페이스를 참조하는 클래스는 인터페이스가 가지고 있는 내용을 구현해야 하는 가이드를 제시한다.
+- 따라서, 인터페이스 자체로는 객체를 만들 수 없고 항상 인터페이스를 구현하는 클래스에서 생성해야 한다.
+- 코틀린은 한 번에 2개 이상의 클래스를 상속받는 다중 상속을 지원하지 않는다. 하지만, 인터페이스로는 필요한 만큼 다수의 인터페이스를 지정해 구현할 수 있다.
+- 만일 동일한 이름의 프로퍼티나 메서드가 있다면 앵글 브래킷(<>)을 사용해 접근하려는 클래스나 인터페이스의 이름을 정해 줄 수 있다.
+
+```kotlin
+// AngleBracketTest.kt
+package chap05.section4
+
+open class A {
+    open fun f() = println("A Class f()")
+    fun a() = println("A Class a()")
+}
+
+interface B {
+    fun f() = println("B Interface f()") // 인터페이스는 기본적으로 open이다.
+    fun b() = println("B Interface b()")
+
+}
+
+class C : A(), B { // 쉼표(,)를 사용해 클래스와 인터페이스를 지정
+    // 컴파일되려면 f()가 오버라이딩되어야 함
+    override fun f() = println("C Class f()")
+
+    fun test() {
+        f() // 현재 클래스의 f()
+        b() // 인터페이스 B의 b()
+        super<A>.f() // A 클래스의 f()
+        super<B>.f() // B 클래스의 f()
+
+    }
+
+}
+
+fun main() {
+    val c = C()
+    c.test()
+}
+-- 실행 결과 --
+C Class f()
+B Interface b()
+A Class f()
+B Interface f()
+```
+
+## 정보 은닉 캡슐화
+
+우리가 어떤 것을 사용할 때 내부의 구조를 숨겨도 사용할 수 있는 형태가 있을 수 있다. 예를 들면, 자동차의 핸들은 우리가 만질 수 있도록 공개되어 있다. 하지만 그 아래 조향 장치나 엔진은 차체 내부에 숨겨져 있다.
+
+이와 마찬가지로 클래스를 작성할 때 숨겨야 하는 속성이나 기능이 있을 수 있다. 이러한 개념을 캡슐화(Encapsulation)라고 한다.
+
+### 가시성 지시자
+
+- 각 클래스나 메서드, 프로퍼티의 접근 범위를 가시성(Visibility)라고 한다.
+- 각 클래스나 메서드, 프로퍼티에 가시성 지시자에 의해 공개할 부분과 숨길 부분을 정해줄 수 있다.
+
+### 가시성 지시자의 종류
+
+- private : 이 요소는 외부에서 접근할 수 없다.
+- public : 이 요소는 어디서든 접근이 가능하다(기본값).
+- protected : 외부에서 접근할 수 없으나 하위 상속 요소에서는 가능하다.
+- internal : 같은 정의의 모듈 내부에서는 접근이 가능하다.
+
+```kotlin
+**[가시성 지지자] <val | var> 전역 변수 이름
+[가시성 지지자] fun 함수 이름() { ... }
+[가시성 지지자] [특정 키워드] class 클래스 이름 [가시성 지지자] constructor(매개변수) {
+		[가시성 지지자] constructor() { ... }
+		[가시성 지지자] 프로퍼티
+		[가시성 지지자] 메서드
+}**
+```
+
+![스크린샷 2023-01-09 오후 2.16.53.png](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/936aa28f-d726-45c4-9d8b-7c16d931deec/%E1%84%89%E1%85%B3%E1%84%8F%E1%85%B3%E1%84%85%E1%85%B5%E1%86%AB%E1%84%89%E1%85%A3%E1%86%BA_2023-01-09_%E1%84%8B%E1%85%A9%E1%84%92%E1%85%AE_2.16.53.png)
+
+### private
+
+- private은 접근 범위가 선언된 요소에 한정하는 가시성 지시자이다.
+- 클래스를 private과 함께 선언하면 그 클래스 안의 멤버만 접근할 수 있다.
+
+```kotlin
+// PrivateTest.kt
+package chap05.section5.privatetest
+
+private class PrivateClass {
+    private var i = 1
+    private fun privateFunc() {
+        i += 1 // 접근 허용
+
+    }
+
+    fun access() {
+        privateFunc() // 접근 허용
+
+    }
+
+}
+
+class OtherClass {
+    val opc = PrivateClass() // 불가 - 프로퍼티 opc는 private이 되어야 함 private val opc로 받는 경우엔 가능
+    fun test() {
+        val pc = PrivateClass() // 생성 가능
+
+    }
+
+}
+
+fun main() {
+    val pc = PrivateClass() // 생성 가능
+    pc.i // 접근 불가
+    pc.privateFunc() // 접근 불가
+}
+
+fun TopFunction() {
+    val tpc = PrivateClass() // 객체 생성 가능
+
+}
+```
+
+### protected
+
+- protected 지시자는 최상위에 선언된 요소에는 지정할 수 없고 클래스나 인터페이스와 같은 요소의 멤버에만 지정할 수 있다.
+- 멤버가 클래스인 경우에는 protected로 선언할 수 있다.
+
+```kotlin
+// ProtectedTest.kt
+package chap05.section5.protectedtest
+
+open class Base{ // 최상위 클래스에는 protected를 사용할 수 없음
+    protected var i = 1
+    protected fun protectedFunc() {
+        i += 1 // 접근허용
+    }
+    
+    fun access() {
+        protectedFunc() // 접근 허용
+        
+    }
+    protected class Nested // 내부 클래스에는 지시자 허용
+}
+
+class Derived : Base() {
+    fun test(base: Base): Int {
+        protectedFunc() // Base 클래스의 메서드 접근 가능
+        return i // Base 클래스의 프로퍼티 접근 가능
+    }
+    
+}
+
+fun main() {
+    val base = Base() // 생성 가능
+    base.i // 접근 불가
+    base.protectedFunc() // 접근 불가
+    base.access() // 접근 가능
+}
+```
+
+예제에서 protected 멤버 프로퍼티인 i와 메서드 protectedFunc( )는 하위 클래스인 Derived 클래스에서 접근할 수 있다. protected로 지정된 멤버는 상속된 하위 클래스에서는 자유롭게 접근이 가능하다. 다만 외부 클래스나 객체 생성 후 점(.) 표기를 통해 protected 멤버에 접근하는 것은 허용하지 않는다.
+
+### internal
+
+- 코틀린의 internal은 자바와 다르게 새롭게 정의된 이름이다.
+- internal은 프로젝트 단위의 모듈(Module)을 가리킨다. (모듈이 달라지면 접근 불가)
+
+```kotlin
+// InternalTest.kt
+package chap05.section5.internal
+
+internal class InternalClass {
+    internal var i = 1
+    internal fun icFunc() {
+        i += 1 // 접근 허용
+        
+    }
+    fun access() {
+        icFunc() // 접근 허용
+        
+    }
+    
+}
+
+class Other {
+    internal val ic = InternalClass() // 프로퍼티를 지정할 때 internal로 맞춰야함
+    fun test() {
+        ic.i // 접근 허용
+        ic.icFunc() // 접근 허용
+        
+    }
+    
+}
+
+fun main() {
+    val mic = InternalClass() // 생성 가능
+    mic.i // 접근 허용
+    mic.icFunc() // 접근 허용
+}
+```
+
+같은 프로젝트의 모듈에만 있으면 어디서든 접근이 가능하다.
+
+### 가시성 지시자와 클래스의 관계
+
+```kotlin
+open class Base {
+		private val a: Int = 1
+		protected open val b: Int = 2
+		internal val c: Int = 3
+		val d: Int = 4
+
+		protected class Nested {
+				// 이 클래스에서는 a,b,c,d,e,f 접근 가능
+				public val e: Int = 5
+				private val f: Int = 6
+		}
+}
+
+class Derived : Base() {
+		// 이 클래스에서는 b,c,d,e 접근 가능
+		// a는 접근 불가
+		override val b = 5 // Base의 b는 오버라이딩됨 - 상위와 같은 protected 지시자
+}
+```
+
+### 자동차와 도둑의 예제
+
+```kotlin
+// CarVisibilityPublic.kt
+package chap05.section5.burglar
+
+open class Car protected constructor(_year: Int, _model: String, _power: String, _wheel: String) {
+    private var year: Int = _year
+    public var model: String = _model
+    protected open var power: String = _power
+    internal var wheel: String = _wheel
+
+    protected fun start(key: Boolean) {
+        if (key) println("Start the Engine!")
+    }
+
+    class Driver(_name: String, _license: String) {
+        private var name: String = _name
+        var license: String = _license
+        internal fun driving() = println("[Driver] Driving() - $name")
+    }
+}
+
+class Tico(_year: Int, _model: String, _power: String, _wheel: String, var name: String, private var key: Boolean)
+    : Car(_year, _model, _power, _wheel) {
+    override var power: String = "50hp"
+    val driver = Driver(name, "first class")
+
+    constructor(_name: String, _key: Boolean) : this(2014, "basic", "100hp", "normal", _name, _key) {
+        name = _name
+        key = _key
+    }
+
+    fun access(password: String) {
+        if(password == "gotico") {
+            println("---- [Tico] access() ----")
+            // super.year // private 접근 불가
+            println("super.model = ${super.model}") // public
+            println("super.power = ${super.power}") // protected
+            println("super.wheel = ${super.wheel}") // internal
+
+            super.start(key)
+
+            // driver.name // private 접근 불가
+            println("Driver().license = ${driver.license}") // public
+            driver.driving()
+        } else {
+            println("You're a burglar")
+        }
+
+    }
+
+}
+
+class Burglar() {
+    fun steal(anycar: Any) {
+        if (anycar is Tico) { // 4. 인자가 Tico의 객체일 때
+            println("---- [Burglar] steal() ----")
+            // println(anycar.power) // protected 접근 불가
+            // println(anycar.year) // private 접근 불가
+            println("anycar.name = ${anycar.name}") // public 접근
+            println("anycar.wheel = ${anycar.wheel}") // internal 접근 (같은 모듈 안에 있으므로)
+            println("anycar.model = ${anycar.model}") // public 접근
+
+            println(anycar.driver.license) // public 접근
+            anycar.driver.driving() // internal 접근 (같은 모듈 안에 있으므로)
+            // println(Car.start()) // protected 접근 불가
+            anycar.access("dontknow")
+        } else {
+            println("Nothing to steal")
+        }
+    }
+}
+
+fun main() {
+    // val car = Car() // protected 생성 불가 상속받은 객체로 생성해야한다.
+    val tico = Tico("kildong", true)
+    tico.access("gotico")
+
+    val burglar = Burglar()
+    burglar.steal(tico)
+}
+
+-- 실행 결과 --
+---- [Tico] access() ----
+super.model = basic
+super.power = 100hp
+super.wheel = normal
+Start the Engine!
+Driver().license = first class
+[Driver] Driving() - kildong
+---- [Burglar] steal() ----
+anycar.name = kildong
+anycar.wheel = normal
+anycar.model = basic
+first class
+[Driver] Driving() - kildong
+You're a burglar
+
+Process finished with exit code 0
+```
+
+Car 클래스의 주 생성자에는 protected 지시자가 있기 때문에 constructor 키워드를 생략할 수 없으며 Car 클래스를 상속한 클래스만이 Car 클래스의 객체를 생성할 수 있다.
+
+## 클래스와 클래스의 관계
+
+현실 세계에서는 사람들끼리 서로 관계를 맺고 서로 메시지를 주고 받으며, 필요한 경우 서로의 관계를 이용하여 우리의 삶을 풍요롭게 한다. 혹은 사장과 직원 간의 관계처럼 주로 단방향의 지시 메시지르 보내는 관계도 있다.
+
+### 클래스 혹은 객체 간의 관계
+
+클래스들이나 객체들 간의 관계는 약하게 연결된 관계부터 강하게 결합된 관계가 있다.
+
+- 약하게 참조되고 있는 관계(객체를 이용하는 수준) : 연관(Association), 의존(Dependency)
+- 집합(Aggregation) : ex) 연못에 있는 오리, 연못과 오리는 서로 따로 떨어져도 문제가 없다.
+- 구성(Composition) : 두 개체가 아주 밀접하게 관련되어 있어 독립적으로 존재하기 힘든 것
+ex) 자동차와 엔진 , 자동차 클래스가 파괴되면 엔진도 더 이상 작동하지 않는다. 두 개체 간의 생명주기가 의존 되어 있다.
+    
+    ![스크린샷 2023-01-09 오후 3.53.05.png](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/d7f63eb0-2bc9-4563-aa91-1f930a18a5c4/%E1%84%89%E1%85%B3%E1%84%8F%E1%85%B3%E1%84%85%E1%85%B5%E1%86%AB%E1%84%89%E1%85%A3%E1%86%BA_2023-01-09_%E1%84%8B%E1%85%A9%E1%84%92%E1%85%AE_3.53.05.png)
+    
+    ![스크린샷 2023-01-09 오후 3.56.20.png](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/5dcfda9e-fa49-4db5-a30e-5fb434a895e0/%E1%84%89%E1%85%B3%E1%84%8F%E1%85%B3%E1%84%85%E1%85%B5%E1%86%AB%E1%84%89%E1%85%A3%E1%86%BA_2023-01-09_%E1%84%8B%E1%85%A9%E1%84%92%E1%85%AE_3.56.20.png)
+    
+
+### 연관 관계
+
+- 연관(Association)관계란 2개의 서로 분리된 클래스가 연결을 가지는 것이다.
+- 단방향 혹은 양방향으로 연결될 수 있다.
+- 핵심은 두 요소가 서로 다른 생명주기를 가지고 있다.
+
+```kotlin
+// AssociationTest.kt
+package chap05.section6.association
+
+class Patient(val name: String) {
+    fun doctorList(d: Doctor) { // 인자로 참조
+        println("Patient: $name, Doctor: ${d.name}")
+    }
+}
+
+class Doctor(val name: String) {
+    fun patientList(p: Patient) { // 인자로 참조
+        println("Doctor: $name, Patient: ${p.name}")
+    }
+}
+
+fun main() {
+    val doc1 = Doctor("KimSabu") // 객체가 따로 생성됨
+    val patient1 = Patient("Kildong")
+    doc1.patientList(patient1)
+    patient1.doctorList(doc1)
+}
+```
+
+### 의존 관계
+
+- 한 클래스가 다른 클래스에 의존되어 있어 영향을 주는 경우 의존(Dependency)관계라고 한다.
+- Doctor 클래스를 생성하려고 하는데 먼저 Patient의 객체가 필요한 경우 Doctor는 Patient의 객체에 의존하는 관계가 된다.
+
+```kotlin
+// DependencyTest.kt
+package chap05.section6.dependency
+
+class Patient(val name: String, var id: Int) {
+    fun doctorList(d: Doctor){
+        println("Patient: $name, Doctor: ${d.name}")
+    }
+}
+
+class Doctor(val name: String, val p: Patient) {
+    val customerId: Int = p.id
+    
+    fun patientList() {
+        println("Doctor: $name, Patient: ${p.name}")
+        println("Patient Id: $customerId")
+    }
+}
+
+fun main() {
+    val patient1 = Patient("Kildong", 1234)
+    val doc1 = Doctor("KimSabu", patient1)
+    doc1.patientList()
+}
+```
+
+### 집합 관계
+
+- 집합(Aggregation)관계는 연관 관계와 거의 동일하지만 특정 객체를 소유한다는 개념이 추가된 것이다.
+
+```kotlin
+// AggregationTest.kt
+package chap05.section6
+
+class Pond(_name: String, _members: MutableList<Duck>) {
+    val name: String = _name
+    val members: MutableList<Duck>  = _members
+    constructor(_name: String) : this(_name, mutableListOf<Duck>())
+
+}
+
+class Duck(val name: String)
+
+fun main() {
+    // 두 개체는 서로 생명주기에 영향을 주지 않는다.
+    val pond = Pond("myFavorite")
+    val duck1 = Duck("Duck1")
+    val duck2 = Duck("Duck2")
+
+    // 연못에 오리를 추가 - 연못에 오리가 집합
+    pond.members.add(duck1)
+    pond.members.add(duck2)
+
+    // 연못에 있는 오리들
+    for (duck in pond.members) {
+        println(duck.name)
+    }
+}
+```
+
+### 구성 관계
+
+- 구성(Compostion)관계는 집합 관계와 거의 동일하지만 특정 클래스가 어느 한 클래스의 부분이 되는 것이다.
+- 구성품으로 지정된 클래스는 생명주기가 소유자 클래스에 의존되어 있다.
+- 만일 소유자 클래스가 삭제되면 구성하고 있던 클래스도 같이 삭제 된다.
+
+```kotlin
+// CompositionTest.kt
+package chap05.section6.composition
+
+class Car(val name: String, val power: String) {
+    private var engine = Engine(power)
+
+    fun startEngine() = engine.start()
+    fun stopEngine() = engine.stop()
+}
+
+class Engine(power: String) {
+    fun start() = println("Engine has been started.")
+    fun stop() = println("Engine has been stopped.")
+}
+
+fun main() {
+    val car = Car("tico", "100hp")
+    car.startEngine()
+    car.stopEngine()
+}
+```
+
+# 🥲 어려웠던 점 (ex. 에러난 부분)
+
+---
+
+- 생성자에서 this나 super를 호출할 때 상속하는 것처럼 호출해서 이해가 어려웠다.  constructor에는 open이나 override 키워드를 사용하지 않기 때문에
+
+---
+
+<aside>
+✅ 체크 리스트
+
+- [x]  2시간 이상 공부하셨나요?
+- [ ]  내용을 정확히 이해했나요?
+- [x]  코드에 주석은 달았나요?
+</aside>
+
+[Kotlin-Study/8일차 at main · ghdcksgml1/Kotlin-Study](https://github.com/ghdcksgml1/Kotlin-Study/tree/main/8%EC%9D%BC%EC%B0%A8)
