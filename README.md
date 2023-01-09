@@ -6,6 +6,8 @@
 
 <img width="776" alt="스크린샷 2022-12-24 오후 9 47 51" src="https://user-images.githubusercontent.com/79779676/209934309-8d791a42-5ddf-4849-be61-6bbd90e822c6.png">
 
+<br><br><br><br>
+
 # 📘 공부 내용정리 - 1일차
 
 ---
@@ -168,7 +170,7 @@ class UserInfor {}
 
 [Kotlin-Study/1일차 at main · ghdcksgml1/Kotlin-Study](https://github.com/ghdcksgml1/Kotlin-Study/tree/main/1%EC%9D%BC%EC%B0%A8)
 
-<br><br><br><br>
+<br><br><br><br><br><br><br><br>
 
 # 📘 공부 내용정리 - 2일차
 
@@ -714,7 +716,7 @@ fun main {
 
 [Kotlin-Study/2일차/KotlinProgramming at main · ghdcksgml1/Kotlin-Study](https://github.com/ghdcksgml1/Kotlin-Study/tree/main/2%EC%9D%BC%EC%B0%A8/KotlinProgramming)
 
-<br><br><br><br>
+<br><br><br><br><br><br><br><br>
 
 # 📘 공부 내용정리 - 3일차
 
@@ -1149,6 +1151,8 @@ fun sum(a: Int, b: Int) = a + b
 
 [Kotlin-Study/3일차/KotlinProgramming/src/chap03 at main · ghdcksgml1/Kotlin-Study](https://github.com/ghdcksgml1/Kotlin-Study/tree/main/3%EC%9D%BC%EC%B0%A8/KotlinProgramming/src/chap03)
 
+<br><br><br><br><br><br><br><br>
+
 # 📘 공부 내용정리 - 4일차
 
 ---
@@ -1497,7 +1501,7 @@ inline fun shortFun3(a: Int, out: (Int) -> Unit) {
 
 [Kotlin-Study/4일차 at main · ghdcksgml1/Kotlin-Study](https://github.com/ghdcksgml1/Kotlin-Study/tree/main/4%EC%9D%BC%EC%B0%A8)
 
-<br><br><br><br>
+<br><br><br><br><br><br><br><br>
 
 # 📘 공부 내용정리 - 6일차
 
@@ -2105,3 +2109,460 @@ fun validateName(name : String) {
 </aside>
 
 [Kotlin-Study/6일차 at main · ghdcksgml1/Kotlin-Study](https://github.com/ghdcksgml1/Kotlin-Study/tree/main/6%EC%9D%BC%EC%B0%A8)
+
+<br><br><br><br><br><br><br><br>
+
+# 📘 공부 내용정리 - 7일차
+
+---
+
+## 클래스와 객체의 정의
+
+- 객체 지향 프로그래밍(OOP)은 프로그램의 구조를 객체 간 상호작용으로서 표현하는 프로그래밍 방식이다.
+- 추상화(Abstraction): 특정 클래스를 만들 때 기본 형식을 규정하는 방법
+- 인스턴스(Instance): 클래스로부터 생성한 객체
+- 상속 (Inheritance): 부모 클래스의 내용을 자식 클래스가 그대로 물려받음
+- 다형성(Polymorphism): 하나의 이름으로 다양한 처리를 제공
+- 캡슐화(Encapsulation): 내용을 숨기고 필요한 부분만 사용
+- 메시지 전송(Mesaage Sending): 객체 간에 주고받는 메시지
+- 연관 (Association): 클래스 간의 관계
+
+### 객체 지향 프로그래밍과 용어
+
+| 코틀린에서 사용하는 용어 | 다른 언어에서 사용하는 용어 |
+| --- | --- |
+| 클래스(Class) | 분류, 범주 |
+| 프로퍼티(Property) | 속성(Attribute), 변수(Variable), 필드(Field), 데이터(Data) |
+| 메서드(Method) | 함수(Function), 동작(Operation), 행동(Behavior) |
+| 객체(Object) | 인스턴스(Instance) |
+
+클래스의 멤버 = 함수(class) + 변수(property)
+
+### 클래스의 멤버가 될 수 있는 것
+
+- 생성자와 초기화 블록: 객체가 생성될 때 자동 실행되는 메서드 또는 코드 블록
+- 프로퍼티 : 변수의 이름과 변수의 접근 함수가 포함된 형태
+- 메서드: 일반적인 함수의 형태
+- 중첩(Nested) 클래스와 이너(Inner) 클래스: 클래스 내부에 구성되는 클래스
+- 객체 선언: 클래스 없이 접근할 수 있는 객체
+
+### 클래스 다이어그램
+
+- 클래스를 이해하기 쉽게 표현하려면 통합 모델링 언어(UML: Unified Modeling Language)를 사용한다.
+- 클래스 다이어그램(Class Diagram): 클래스의 정의와 관계를 나타내는 다이어그램
+- 시퀀스 다이어그램(Sequence Diagram): 시간의 개념을 통해 클래스에서 생성된 객체의 실행 흐름을 나타냄
+- 유스 케이스 다이어그램(Use Case Diagram): 사용자 관점에서 사용 방법에 대해 설명
+- 상태 머신 다이어그램(State-Machine Diagram): 시스템 관점에서 상태가 어떻게 변화하는지 나타냄.
+
+### 추상화
+
+- 목표로 하는 대상에 대해 필요한 만큼 속성과 동작을 정의하는 과정
+
+### 클래스 선언하기
+
+```kotlin
+class Bird { } // 내용이 비어 있는 클래스 선언
+class Bird // 중괄호는 생략 가능
+```
+
+- Bird 클래스 만들어 보기
+
+```kotlin
+// BirdClassDefine.kt
+package chap05.section1.define
+
+class Bird { // 클래스의 정의
+		// 프로퍼티 (속성)
+    var name: String = "mybird"
+    var wing: Int = 2
+    var beak: String = "short"
+    var color: String = "blue"
+
+		// 메서드 (함수)
+    fun fly() = println("Fly wing; $wing")
+    fun sing(vol: Int) = println("Sing vol: $vol")
+
+}
+
+fun main() {
+    val coco = Bird() // 클래스의 생성자를 통한 객체의 생성
+    coco.color = "blue" // 객체의 프로퍼티에 값 할당
+
+    println("coco.color: ${coco.color}") // 객체의 멤버 프로퍼티 읽기
+    coco.fly() // 객체의 멤버 메서드 사용
+    coco.sing(3)
+}
+```
+
+![스크린샷 2023-01-06 오전 10.02.16.png](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/16c4b88c-1f49-4701-a251-48fe9e0b2866/%E1%84%89%E1%85%B3%E1%84%8F%E1%85%B3%E1%84%85%E1%85%B5%E1%86%AB%E1%84%89%E1%85%A3%E1%86%BA_2023-01-06_%E1%84%8B%E1%85%A9%E1%84%8C%E1%85%A5%E1%86%AB_10.02.16.png)
+
+## 생성자
+
+- 생성자(Constructor)란 클래스를 통해 객체가 만들어질 때 기본적으로 호출되는 함수를 말한다.
+
+```kotlin
+class 클래스 이름 constructor(필용한 매개변수..) { // 주 생성자의 위치
+		...
+		constructor(필요한 매개변수..) { // 부 생성자의 위치
+				// 프로퍼티의 초기화
+		}
+		[constructor(필요한 매개변수..) { ... }] // 추가 부 생성자
+		...
+}
+```
+
+- 생성자는 주 생성자와 부 생성자로 나뉘며 필요에 따라 주 생성자 또는 부 생성자를 사용할 수 있다.
+- 부 생성자 : 필요하면 매개변수를 다르게 여러 번 정의할 수 있다.
+
+### 부 생성자
+
+- 부 생성자는 클래스의 본문에 함수처럼 선언한다.
+
+```kotlin
+// BirdSecondaryConstructor.kt
+package chap05.section2.secondary
+
+class Bird {
+    // 프로퍼티
+    var name: String
+    var wing: Int
+    var beak: String
+    var color: String
+
+    // 부 생성자 - 매개변수를 통해 초기화할 프로퍼티에 지정 
+    constructor(name: String, wing: Int, beak: String, color: String) {
+        this.name = name
+        this.wing = wing
+        this.beak = beak
+        this.color = color
+    }
+
+		// 메서드
+    fun fly() = {println("Fly wing: $wing")}
+    fun sing(vol: Int) = println("Sing vol: $vol")
+}
+
+fun main() {
+    val coco = Bird("mybird", 2, "short", "blue")
+
+    coco.color = "yellow"
+    println("coco.color: ${coco.color}")
+    coco.fly()
+    coco.sing(3)
+}
+```
+
+위의 생성자와 같이 this 키워드를 사용하고 싶지 않은 경우에는 변수 이름 앞에 언더스코어(_)를 붙여주는 방법도 있다.
+
+### 부 생성자를 여러 개 포함한 클래스 사용하기
+
+- 코틀린에서는 클래스에 부 생성자를 하나 이상 포함할 수 있다.
+- 클래스 내부에 constructor( ) 함수 형태로 매개변수가 다르게 여러 번 선언할 수 있다.
+
+```kotlin
+class 클래스 이름 {
+		constructor(매개변수[, 매개변수...]) {
+				// 코드
+		}
+
+		constructor(매개변수[, 매개변수...]) {
+				// 코드
+		}
+		...
+
+}
+```
+
+### 주 생성자
+
+- 주 생성자는 클래스 이름과 함께 생성자 정의를 이용할 수 있는 기법이다.
+- 주 생성자는 클래스 이름과 블록 시작 부분 사이에 선언한다.
+
+```kotlin
+...
+// 주 생성자 선언
+class Bird constructor(_name: String, _wing: Int, _beak: String, _color: String) {
+		// 프로퍼티
+		var name: String = _name
+		var wing: Int = _wing
+		var beak: String = _beak
+		var color: String = _color
+
+		// 메서드
+		fun fly() = println("Fly wing: $wing")
+		fun sing(vol: Int) = println("Sing vol: $vol")
+}
+...
+```
+
+### 프로퍼티를 포함한 주 생성자
+
+- 내부의 프로퍼티를 생략하고 생성자의 매개변수에 프로퍼티 표현을 함께 넣을 수 있다.
+- 코드가 간결하게 줄어듦
+
+```kotlin
+class Bird(val name: String, val wing: Int, val beak: String, var color: String) {
+... // constructor 생략
+```
+
+```kotlin
+// BirdPrimaryConstructor.kt
+package chap05.section2.primary
+
+import chap05.section2.secondary.Bird
+
+class Bird(var name: String, var wing: Int, var beak: String, var color: String) {
+    // 프로퍼티는 매개변수 안에 var를 사용해 프로퍼티로서 선언되어 본문에서 생략됨.
+
+    // 메서드
+    fun fly() = {println("Fly wing: $wing")}
+    fun sing(vol: Int) = println("Sing vol: $vol")
+}
+
+fun main() {
+    val coco = Bird("mybird", 2, "short", "blue")
+
+    coco.color = "yellow"
+    println("coco.color: ${coco.color}")
+    coco.fly()
+    coco.sing(3)
+}
+```
+
+### 초기화 블록을 가진 주 생성자
+
+- 생성자는 기본적으로 함수를 표현하는 기능이기 때문에 변수를 초기화하는 것 말고도 특정한 작업을 하도록 초기화하는 것 말고도 특정한 작업을 하도록 코드를 작성할 수 있다.
+
+```kotlin
+// BirdPrimaryInit.kt
+package chap05.section2.init
+
+import chap05.section2.secondary.Bird
+
+class Bird(var name: String, var wing: Int, var beak: String, var color: String) {
+    // 초기화 블록
+    init {
+        println("-------- 초기화 블록 시작 ---------")
+        println("이름은 $name, 부리는 $beak")
+        this.sing(3)
+        println("-------- 초기화 블록 끝 ---------")
+    }
+
+    // 메서드
+    fun fly() = {println("Fly wing: $wing")}
+    fun sing(vol: Int) = println("Sing vol: $vol")
+}
+
+fun main() {
+    val coco = Bird("mybird", 2, "short", "blue")
+
+    coco.color = "yellow"
+    println("coco.color: ${coco.color}")
+    coco.fly()
+}
+```
+
+### 프로퍼티의 기본값 지정
+
+- 생성자의 매개변수에 기본값을 사용할 수 있다.
+- 객체를 생성할 때 기본값이 있는 인자는 생략할 수 있다.
+
+```kotlin
+// 프로퍼티의 기본값 지정
+class Bird(var name: String = "NoName", var wing: Int = 2, 
+					var beak: String, var color: String) {
+		...
+}
+
+fun main() {
+		val coco = Bird(beak = "long", color = "red") // 기본값이 있는 것은 생략하고 없는것만 전달 가능
+}
+```
+
+### 상속과 다형성
+
+- 클래스는 자식 클래스를 만들 때 상위 클래스의 속성과 기능을 물려받아 계승하는데 이것을 상속이라고 한다.
+- 상속을 이용하면 하위 클랫는 일부러 상위 클래스의 모든 내용을 다시 만들지 않아도 된다.
+- 다형성(Polymorphism): 메서드가 같은 이름을 사용하지만 구현내용이 다르거나 매개변수가 달라서 하나의 이름으로 다양한 기능을 수행할 수 있는 개념
+- 코틀린에서는 open키워드로 선언해야만 상속할 수 있는 클래스가 된다.
+    
+    ![스크린샷 2023-01-06 오전 11.03.44.png](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/6b37bc03-90d6-4043-9fea-3147e54cda7f/%E1%84%89%E1%85%B3%E1%84%8F%E1%85%B3%E1%84%85%E1%85%B5%E1%86%AB%E1%84%89%E1%85%A3%E1%86%BA_2023-01-06_%E1%84%8B%E1%85%A9%E1%84%8C%E1%85%A5%E1%86%AB_11.03.44.png)
+    
+
+```kotlin
+open class 기반 클래스 이름 { // 묵시적으로 Any로부터 상속됨, open으로 파생 가능
+...
+}
+class 파생 클래스 이름 : 기반 클래스 이름() { // 기반 클래스로부터 상속됨, 최종 클래스로 파생 불가
+...
+}
+
+//////////////////////////////////////////////////////////////////
+
+val someVal: Int // 일반 변수의 선언
+open class BaseClass(someArgs: Int) // 상속 가능한 클래스
+class SomeClass(someArgs: Int) : BaseClass(someArgs) // 클래스 상속의 선언
+class SomeClass : BaseClass { ..constructor().. } // 부 생성자를 사용할 때 클래스 상속 선언
+```
+
+- 파생 클래스 만들어 보기
+
+```kotlin
+// BirdChildClasses.kt
+package chap05.section3.openclass
+
+// 상속 가능한 클래스를 선언하기 위해 open 사용
+open class Bird(var name: String, var wing: Int, var beak: String, var color: String) {
+    // 메서드
+    fun fly() = println("Fly wing: $wing")
+    fun sing(vol: Int) = println("Sing vol: $vol")
+}
+
+// 주 생성자를 사용하는 상속
+class Lark(name: String, wing: Int, beak: String, color: String) : Bird(name, wing, beak, color) {
+    fun singHitone() = println("Happy Song!") // 새로 추가한 메서드
+}
+
+// 부 생성자를 사용하는 상속
+class Parrot : Bird {
+    val language: String
+
+    constructor(name: String,
+                wing: Int,
+                beak: String,
+                color: String,
+                language: String) : super(name, wing, beak, color) {
+        this.language = language // 새로 추가한 프로퍼티
+    }
+
+    fun speak() = println("Speak! $language")
+}
+
+fun main() {
+    val coco = Bird("mybird", 2, "short", "blue")
+    val lark = Lark("mylark",2,"long","brown")
+    val parrot = Parrot("myparrot",2,"short","multiple","korean") // 프로퍼티 추가
+
+    println("Coco: ${coco.name}, ${coco.wing}, ${coco.beak}, ${coco.color}")
+    println("Lark: ${lark.name}, ${lark.wing}, ${lark.beak}, ${lark.color}")
+    println("Parrot: ${parrot.name}, ${parrot.wing}, ${parrot.beak}, ${parrot.color}, ${parrot.language}")
+
+    lark.singHitone() // 새로 추가한 메서드 사용 가능
+    parrot.speak()
+    lark.fly()
+}
+```
+
+**이렇게 하위 클래스는 상위 클래스의 메서드나 프로퍼티를 그대로 상속하면서 상위 클래스에는 없는 자신만의 프로퍼티나 메서드를 확장할 수 있다.**
+
+### 다형성
+
+- 클래스를 상속하다 보면 같은 이름이지만 매개변수를 다르게 하거나 아예 기능 구현부를 다르게 작성할 필요가 생길 수 있다.
+- 이름이 동일하지만 매개변수가 서로 다른 형태를 취하거나 실행 결과를 다르게 가질 수 있는 것을 다형성이라고 한다.
+- 오버로딩(Overloading) : 동작은 동일하지만, 인자의 형식만 달라지는 것
+- 오버라이딩(Overriding) : 상위와 하위 클래스에서 메서드나 프로퍼티의 이름은 같지만 기존의 동작을 다른 동작으로 **재정의**하는 것
+
+### 오버 로딩
+
+```kotlin
+fun add(x: Int, y: Int): Int { // 정수형 매개변수 2개를 더함
+		return x + y
+}
+
+fun add(x: Double, y: Double): Double { // 실수형 매개변수 2개를 더함
+		return x + y
+}
+
+fun add(x: Int, y: Int, z: Int): Int { // 정수형 매개변수 2개를 더함
+		return x + y + z
+}
+```
+
+```kotlin
+// OverloadCalc.kt
+package chap05.section3
+
+fun main() {
+    val calc = Calc()
+    println(calc.add(3,2))
+    println(calc.add(3.2,1.3))
+    println(calc.add(3,3,2))
+    println(calc.add("Hello","World"))
+}
+
+class Calc {
+    // 다양한 매개변수로 오버로딩된 메서드
+    fun add(x: Int, y: Int): Int = x + y
+    fun add(x: Double, y: Double): Double = x + y
+    fun add(x: Int, y: Int, z: Int): Int = x + y + z
+    fun add(x: String, y: String): String = x + y
+}
+```
+
+### 오버라이딩
+
+- 상속을 하려면 class 앞에 open을 붙여야했다. 오버라이딩도 마찬가지로 상위 클래스 메서드 앞에 open이 붙어 있어야 오버라이딩을 할 수 있다.
+- 오버라이딩 할때에는 오버라이딩 할 메서드 앞에 override 키워드를 적어주면 된다.
+
+```kotlin
+open class Bird {
+...
+		fun fly() { ... }
+		open fun sing() { ... }
+}
+
+class Lark() : Bird() {
+		fun fly() { /* 재정의 */ } // 오류! 상위 메서드에 open 키워드가 없어 오버라이딩 불가
+		override fun sing() { /* 구현부를 새롭게 재정의 */ } // 구현부를 새롭게 작성
+}
+```
+
+- 기능 변경이 싫어서 아예 오버라이딩을 막고자 하려면 final 키워드를 사용하면 하위 클래스에서 재정의 되는 것을 막을 수 있다.
+
+```kotlin
+open class Lark() : Bird() {
+		final override fun sing() { /* 구현부를 새롭게 재정의 */ } // 하위 클래스에서 재정의를 막음
+}
+```
+
+```kotlin
+// BirdOverrideEx.kt
+package chap05.section3.override
+
+open class Bird(var name: String, var wing: Int, var beak: String, var color: String) {
+    fun fly() = println("Fly wing: $wing")
+    open fun sing(vol: Int) = println("Sing vol: $vol")
+}
+
+class Parrot(name: String,
+            wing: Int = 2,
+            beak: String,
+            color: String,
+             var language: String = "natural") : Bird(name, wing, beak, color) {
+    fun speak() = println("Speak! $language")
+    override fun sing(vol: Int) {
+        println("I'm a parrot! The volume level is $vol")
+        speak()
+    }
+}
+
+fun main() {
+    val parrot = Parrot(name ="myparrot", beak = "short", color = "multiple")
+    parrot.language = "English"
+
+    println("Parrot: ${parrot.name}, ${parrot.wing}, ${parrot.beak}, ${parrot.color}, ${parrot.language}")
+    parrot.sing(5)
+}
+```
+
+---
+
+<aside>
+✅ 체크 리스트
+
+- [x]  2시간 이상 공부하셨나요?
+- [x]  내용을 정확히 이해했나요?
+- [x]  코드에 주석은 달았나요?
+</aside>
+
+[Kotlin-Study/7일차 at main · ghdcksgml1/Kotlin-Study](https://github.com/ghdcksgml1/Kotlin-Study/tree/main/7%EC%9D%BC%EC%B0%A8)
