@@ -3212,3 +3212,657 @@ fun main() {
 </aside>
 
 [Kotlin-Study/8일차 at main · ghdcksgml1/Kotlin-Study](https://github.com/ghdcksgml1/Kotlin-Study/tree/main/8%EC%9D%BC%EC%B0%A8)
+
+<br><br><br><br><br><br><br><br>
+
+# 📘 공부 내용정리 - 9일차
+
+---
+
+## 프로퍼티와 초기화
+
+코틀린에서 getter와 setter는 자동으로 생성된다. 또 코틀린에서 프로퍼티는 반드시 초기화되어야 하는데 나중에 초기화할 수 있또록 lateinit과 lazy를 사용하는 기법이 있다.
+
+### 자바의 필드와 코틀린의 프로퍼티의 차이점
+
+- 자바의 필드 : 자바의 필드는 단순한 변수 선언 부분만을 가지기 때문에 접근하기 위한 메서드를 일일이 만들어 둬야한다. ex) getter & setter
+- 코틀린의 프로퍼티 : 코틀린에서는 변수 선언 부분과 기본적인 접근 메서드를 모두 가지고 있기 때문에 프로퍼티라는 새로운 이름으로 부른다.
+
+```kotlin
+// PersonTest.java
+package chap06.section1;
+
+class Person {
+    // 멤버 필드
+    private String name;
+    private int age;
+
+    // 생성자
+    public Person(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    // 게터와 세터
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+}
+
+class Main {
+    public static void main(String[] args) {
+        Person p1 = new Person("Kildong", 30);
+//        p1.name = "Dooly"; // 오류! 접근 불가
+        p1.setName("Dooly"); // 세터에 의한 접근
+        System.out.println(p1.getName()); // 게터에 의한 접근
+    }
+
+}
+
+// 코틀린으로 변환
+class Person(var name: String, var age: Int)
+```
+
+### 게터와 세터 동작 확인하기
+
+```kotlin
+// GetterSetterTest.kt
+package chap06.section1
+
+class User(_id: Int, _name: String, _age: Int) {
+    // 프로퍼티
+    val id: Int = _id // 불변 (읽기 전용)
+    var name: String = _name // 변경 가능
+    var age: Int = _age
+
+}
+
+fun main() {
+    val user = User(1, "Sean", 30)
+
+    val name = user.name // 게터에 의한 값 획득
+    
+    user.age = 41 // 세터에 의한 값 지정
+
+    println("name: $name, ${user.age}")
+}
+```
+
+### 기본 게터와 세터 직접 지정하기
+
+```kotlin
+// NormalGetterSetter.kt
+package chap06.section1
+
+class User1(_id: Int, _name: String, _age: Int) {
+    // 프로퍼티
+    val id: Int = _id
+    get() = field
+
+    var name: String = _name
+    get() = field
+    set(value) {
+        field = value
+    }
+
+    var age: Int = _age
+    get() = field
+    set(value) {
+        println("age 값 변경")
+        field = value
+    }
+
+}
+
+fun main() {
+    val user1 = User1(1, "kildong", 30)
+//    user1.id = 2 // val 프로퍼티는 값 변경 불가
+    user1.age = 35
+    println("user1.age = ${user1.age}")
+}
+```
+
+- value: 세터의 매개변수로 외부로부터 값을 가져옴
+- field : 프로퍼티를 참조하는 변수
+
+### 보조 필드의 역할
+
+- field는 프로퍼티를 참조하는 변수로 보조 필드라고 한다.
+- get( ) = field는 결국 각 프로퍼티의 값을 읽는 특별한 식별자이다.
+- 만일 게터와 세터 안에서 field 대신에 get( ) = age와 같이 사용하면 프로퍼티의 get( ) 이 다시 호출되는 것과 마찬가지이기 때문에 무한 재귀 호출에 빠져 스택 오버플로 오류가 발생할 수 있다.
+
+### 커스텀 게터와 세터 사용하기
+
+게터나 세터에 특정 연산을 수행해야할 경우 커스텀 게터와 세터를 사용하면 된다.
+
+```kotlin
+// CustomGetterSetter.kt
+package chap06.section1.customtest
+
+class User(_id: Int, _name: String, _age: Int) {
+    val id: Int = _id
+    var name: String = _name
+    set(value) {
+        println("The name was changed")
+        field = value.uppercase() // 받은 인자를 대문자로 변경해 프로퍼티에 할당
+    }
+
+    var age: Int = _age
+}
+
+fun main() {
+    val user1 = User(1, "kildong", 35)
+    user1.name = "coco" // 여기서 사용자 고유의 출력 코드가 실행된다.
+    println("user3.name = ${user1.name}")
+}
+```
+
+### 보조 프로퍼티의 사용
+
+만일 보조 필드를 사용하지 않는 경우에는 임시적으로 사용할 프로퍼티를 선언해 놓고 게터나 세터에서 사용할 수 있다.
+
+```kotlin
+// CustomGetterSetterBackingProperty.kt
+package chap06.section1.customproperty
+
+import java.lang.AssertionError
+
+class User(_id: Int, _name: String, _age: Int) {
+    val id: Int = _id
+
+    private var tempName: String? = null
+
+    var name: String = _name
+    get() {
+        if (tempName == null) tempName = "NONAME"
+        return tempName ?: throw AssertionError("Asserted by others")
+    }
+
+    var age: Int = _age
+
+}
+
+fun main() {
+    val user1 = User(1, "kildong", 35)
+    user1.name = ""
+    println("user3.name = ${user1.name}")
+}
+```
+
+### 프로퍼티의 오버라이딩
+
+- 프로퍼티는 기본적으로 오버라이딩할 수 없는 final 형태로 선언된다.
+- 오버라이딩을 가능하게 하려면 open 키워드를 사용해 프로퍼티를 선언해야 한다.
+
+```kotlin
+// PropertyOverride.kt
+package chap06.section1
+
+open class First {
+    open val x: Int = 0 // 오버라이딩 가능
+        get() {
+            println("First x")
+            return field
+        }
+    val y: Int = 0 // open 키워드가 없으면 final 프로퍼티
+}
+
+class Second : First() {
+    override val x: Int = 0 // 상위 클래스와 구현부가 다르게 오버라이딩됨
+        get() {
+            println("Second x")
+            return field + 3
+        }
+//    override val y: Int = 0 // 오류! 오버라이딩 불가
+}
+
+fun main() {
+    val second = Second()
+    println(second.x) // 오버라이딩된 두 번째 클래스 객체의 x
+    println(second.y) // 상위 클래스로부터 상속받은 값
+}
+```
+
+하위 클래스에서 val을 var로 바꾸는건 가능하지만, var를 val로 바꾸는 것은 불가능하다.
+
+### 프로퍼티를 이용한 나이 속이기 예제
+
+```kotlin
+// FakeAgeTest.kt
+package chap06.section1
+
+fun main() {
+    val kim = FakeAge()
+    kim.age = 15
+    println("Kim's real age = 15, pretended age = ${kim.age}")
+
+    val hong = FakeAge()
+    hong.age = 35
+    println("Hong's real age = 35, pretended age = ${hong.age}")
+}
+
+class FakeAge {
+    var age: Int = 0
+        set(value) {
+            field = when {
+                value < 18 -> 18
+                value in 18..30 -> value
+                else -> value - 3
+            }
+        }
+}
+```
+
+## 지연 초기화와 위임
+
+프로퍼티를 선언하면 기본적으로 모두 초기화해야 한다. 하지만 객체의 정보가 나중에 나타나는 경우 객체 생성과 동시에 초기화하기 힘든 경우가 있다. 이럴때 지연 초기화를 사용한다.
+
+보통클래스에서는 기본적으로 선언하는 프로퍼티 자료형들은 null을 가질 수 없기 때문에 생성자에서 초기화하거나 매개변수로부터 값을 초기화해야 하는 것이 규칙이다. 초기화를 미루기 위해 지연 초기화 lateinit과 lazy 키워드를 통해 이를 사용할 수 있다.
+
+### lateinit을 사용한 지연 초기화
+
+- 특정 객체의 의존성이 있는 경우에 지연 초기화를 사용한다.
+- 모듈별로 소스 코드를 테스트하는 유닛 테스트를 할 때는 임시적으로 객체를 생성시켜야하는 경우가 많다. 이때도 지연 초기화를 사용한다.
+- lateinit 키워드를 사용하면 프로퍼티에 값이 바로 할당되지 않아도 컴파일러에서 허용하게 된다.
+- 단, 실행할 때까지 값이 비어 있는 상태면 오류를 유발할 수 있다.
+
+```kotlin
+// init 블록을 통한 초기화
+class Person {
+		var name: String
+		init {
+				name = "NONAME" // 프로퍼티 name이 "NONAME"으로 초기화
+		}
+}
+```
+
+```kotlin
+// LateinitTest.kt
+package chap06.section2
+
+class Person {
+    lateinit var name: String // 지연 초기화를 위한 선언
+
+    fun test() {
+        if(!::name.isInitialized) { // 프로퍼티의 초기화 여부 판단
+            println("not initialized")
+        }else {
+            println("initialized")
+        }
+    }
+}
+
+fun main() {
+    val kildong = Person()
+    kildong.test()
+    kildong.name = "Kildong" // 이 시점에서 초기화됨(지연 초기화)
+    kildong.test()
+    println("name = ${kildong.name}")
+}
+```
+
+isInitialized는 프로퍼티가 초기화되었는지 검사하는 코틀린 표준함수 API이다. 프로퍼티 참조를 위해 콜론 2개(::)를 사용했다. 만일 isInitialized가 true를 반환하면 프로퍼티가 할당되었다는 뜻이며 false를 반환하면 할당되지 않았다는 뜻이다. 느낌표(!) 연산자는 Boolean 값의 반대를 의미하므로 첫 번째 조건식 if(!::name.isInitialized)가 false일 경우를 판단한다.
+
+주의: 컴파일러에서는 예외 오류를 감지하지 않기 때문에 깜빡하고 값 할당을 잊으면 안된다.
+
+### 객체 지연 초기화하기
+
+생성자를 통해 객체를 생성할 때도 lateinit을 사용해 필요한 시점에 객체를 지연 초기화할 수 있다.
+
+```kotlin
+date class Person(var name: String, var age: Int)
+
+lateinit var person1: Person // 객체 생성의 지연 초기화
+
+fun main() {
+		person1 = Person("Kildong", 30) // 생성자 호출 시점에서 초기화됨
+		print(person1.name + "is" + perosn1.age.toString())
+}
+```
+
+### lazy를 사용한 지연 초기화
+
+lateinit을 통해서 프로퍼티나 객체를 선언할 때는 val는 허용하지 않고 var로 선언해야 했다.  하지만, var로 선언하면 객체나 프로퍼티의 경우 언제든 값이 변경될 수 있다는 단점이 존재한다. 읽기 전용의 val로 선언한 객체나 프로퍼티를 나중에 초기화하려면 lazy를 적용하면 된다.
+
+### lazy의 특징
+
+- 호출 시점에 by lazy { … } 정의에 의해 블록 부분의 초기화를 진행한다.
+- 불변의 변수 선언인 val에서만 사용 가능하다(읽기 전용).
+- val이므로 값을 다시 변경할 수 없다.
+
+### 프로퍼티 지연 초기화하기
+
+```kotlin
+// ByLazyTest.kt
+package chap06.section2
+
+class LazyTest {
+    init {
+        println("init block")
+    }
+
+    val subject by lazy {
+        println("lazy initialized")
+        "Kotlin Programming" // lazy 반환값
+    }
+
+    fun flow() {
+        println("not initialized")
+        println("subject one: $subject") // 최초 초기화 시점!
+        println("subject two: $subject") // 이미 초기화된 값 사용
+    }
+
+}
+
+fun main() {
+    val test = LazyTest()
+    test.flow()
+}
+```
+
+### 객체 지연 초기화하기
+
+```kotlin
+// ByLazyObj.kt
+package chap06.section2.bylazyobj
+
+class Person(val name: String, val age: Int)
+
+fun main() {
+    var isPersonInstantiated: Boolean = false // 초기화 확인 용도
+
+    val person: Person by lazy {  // lazy를 사용한 person 객체의 지연 초기화
+        isPersonInstantiated = true
+        Person("Kim", 23) // 이 부분이 Lazy 객체로 반환됨.
+    }
+    val personDelegate = lazy { Person("Hong", 40) } // 위임 변수를 사용한 초기화
+
+    println("person init: $isPersonInstantiated")
+    println("personDelegate Init: ${personDelegate.isInitialized()}")
+
+    println("person.name = ${person.name}") // 이 시점에서 초기화
+    println("personDelegate.value.name = ${personDelegate.value.name}") // 이 시점에서 초기화
+
+    println("person init: $isPersonInstantiated")
+    println("personDelegate init: ${personDelegate.isInitialized()}")
+}
+```
+
+by lazy와 lazy 할당의 차이점은 by lazy는 객체의 위임을 나타내고, lazy는 변수에 위임된 Lazy 객체 자체를 나타내므로 이 변수의 value를 한 단계 더 거쳐 객체의 멤버인 value.name과 같은 형태로 접근해야 한다.
+
+### by를 이용한 위임
+
+- 실제 세계에서 위임(Deleation)이란 어떤 특정 일을 대신하는 중간자 역할을 말한다.
+- 코틀린에서도 특정 클래스를 확장하거나 이용할 수 있도록 by를 통한 위임이 가능하다.
+- by를 사용하면 하나의 클래스가 다른 클래스에 위임하도록 선언하여 위임된 클래스가 가지는 멤버를 참조 없이 호출할 수 있게 된다.
+
+```kotlin
+< var | val | class > 프로퍼티 혹은 클래스이름: 자료형 by 위임자
+```
+
+### 클래스의 위임
+
+```kotlin
+interface Animal {
+		fun eat() { ... }
+		...
+}
+class Cat : Animal { }
+val cat = Cat()
+class Robot : Animial by cat // Animal의 정의된 Cat의 모든 멤버를 Robot에 위임
+```
+
+ 만약 Animal 인터페이스를 구현하고 있는 Cat 클래스가 있다면 Animal에서 정의하고 있는 Cat의 모든 멤버를 Robot 클래스로 위임할 수 있다. 즉, Robot은 Cat이 가지는 모든 Animal의 메소드를 가지는데 이것을 클래스 위임(Class Delegation) 이라고 한다.
+
+ Cat은 Animal 자료형의 private 멤버로 Robot 클래스 안에 저장되며 Cat에서 구현된 모든 Animal의 메서드는 정적 메서드로 생성된다.
+
+### 클래스 위임을 사용하는 이유
+
+ 기본적으로 코틀린이 가지고 있는 표준 라이브러리는 open으로 정의되지 않은 클래스를 사용하고 있는데, 다시 말하면 모두 final 형태의 클래스이므로 상속이나 직접 클래스의 기능 확장이 어렵게 된다. 따라서 필요한 경우에만 위임을 통해 상속과 비슷하게 해당 클래스의 모든 기능을 사용하면서 동시에 기능을 추가 확장 구현할 수 있다.
+
+```kotlin
+// DelegatedClass.kt
+package chap06.section2
+
+interface Car {
+    fun go(): String
+}
+
+class VanImpl(val power: String) : Car {
+    override fun go(): String {
+        return "은 짐을 적재하며 ${power}를 가집니다."
+    }
+}
+
+class SportImpl(val power: String) : Car {
+    override fun go(): String {
+        return "은 경주용에 사용되며 ${power}를 가집니다."
+    }
+}
+
+class CarModel(val model: String, impl: Car) : Car by impl {
+    fun carInfo() {
+        println("$model ${this.go()}") // 참조없이 각 인터페이스 구현 클래스의 go()에 접근
+    }
+}
+
+fun main() {
+    val myDamas = CarModel("Damas 2010", VanImpl("100마력"))
+    val my350z = CarModel("350Z 2008", SportImpl("350마력"))
+
+    myDamas.carInfo() // carInfo에 대한 다형성을 나타냄
+    my350z.carInfo()    
+}
+```
+
+### 프로퍼티 위임과 by lazy
+
+ 앞에서 배운 프로퍼티의 lazy도 by lazy { … } 처럼 by가 사용되어 위임된 프로퍼티가 사용되었다는 것을 알 수 있다. 
+
+### observable( ) 함수의 사용 방법
+
+값의 변경이 일어나는 시점에 observable( ) 함수의 코드가 수행된다.
+
+```kotlin
+// DelegatedProperty.kt
+package chap06.section2
+
+import kotlin.properties.Delegates
+
+class User {
+    var name: String by Delegates.observable("NONAME") { // 프로퍼티 위임
+        prop, old, new -> // 람다식 매개변수로 프로퍼티, 기존 값, 새로운 값 지정
+        println("property -> ${prop}")
+        println("$old -> $new") // 이 부분은 이벤트가 발생할 때만 실행
+    }
+
+}
+
+fun main() {
+    val user = User()
+    user.name = "Kildong" // 값이 변경되는 시점에서 첫 이벤트 발생
+    user.name = "Dooly" // 값이 변경되는 시점에서 두번째 이벤트 발생
+}
+```
+
+### vetoable( ) 함수의 사용 방법
+
+```kotlin
+// DelegatedPropertyVetoable.kt
+package chap06.section2
+
+import kotlin.properties.Delegates
+
+fun main() {
+    var max: Int by Delegates.vetoable(0) { // 초깃값은 0
+        prop, old, new ->
+        new > old // 조건에 맞지 않으면 거부권 행사
+    }
+
+    println(max)
+    max = 10
+    println(max)
+
+    // 여기서는 기존값이 새 값보다 크므로 false. 따라서 5를 재할당하지 않음.
+    max = 5
+    println(max)
+
+}
+```
+
+위 vetoable를 보면 기존 값보다 새 값이 커야만 true가 되면서 프로퍼티의 교체 작업이 진행된다. 따라서 max에 5를 삽입했을때 5로 바뀌지 않고 그대로 10으로 남아있다.
+
+## 정적 변수와 컴패니언 객체
+
+  보통 우리가 사용할 수 있는 변수는 사용 범위에 따라 지역 변수와 전역 변수로 나뉜다. 이런 변수들은 초기화를 통해서 사용되며 변수가 영향을 미치는 영역이 존재한다. 객체나 변수를 생성해서 사용할 때 그 변수를 사용할 수 있는 범위가 정해진다.
+
+  그렇다면 모든 변수나 클래스의 객체는 꼭 동적으로 객체를 생성해서 사용해야 하는가? 동적인 초기화 없이 사용할 수 있는 변수 개념이 있다. 바로 정적 변수나 컴패니언 객체이다.
+
+  이것은 동적인 메모리에 할당 해제되는 것이 아닌 프로그램을 실행할 때 고정적으로 가지는 메모리로 객체 생성 없이 사용할 수 있다.
+
+### 컴패니언 객체 사용하기
+
+- 코틀린에서는 정적 변수를 사용할 때 자바의 static 키워드가 없는 대신 컴패니언 객체를 제공한다.
+
+```kotlin
+// CompanionObjectTest.kt
+package chap06.section3
+
+class Person {
+    var id: Int = 0
+    var name: String = "Youngdeok"
+    companion object {
+        var language: String = "Korean"
+        fun work() {
+            println("working...")
+        }
+    }
+}
+
+fun main() {
+    println(Person.language) // 인스턴스를 생성하지 않고 기본값 사용
+    Person.language = "English" // 기본값 변경 가능
+    println(Person.language) // 변경된 내용 출력
+    Person.work() // 메서드 실행
+//    println(Person.name) // name은 컴패니언 객체가 아니므로 오류가 난다.
+}
+```
+
+companion object 괄호안에 정적으로 선언하고 싶은 프로퍼티, 메서드를 넣으면 객체 생성 없이 사용 가능하다.
+
+```kotlin
+// KCustomer.kt
+package chap06.section3
+
+class KCustomer {
+    companion object {
+        const val LEVEL = "INTERMEDIATE"
+        @JvmStatic fun login() = println("Login..") // 어노테이션 표기 사용
+    }
+}
+
+// KCustomerAccess.java
+package chap06.section3;
+
+public class KCustomerAccess {
+    public static void main(String[] args) {
+        System.out.println("KCustomer.LEVEL = " + KCustomer.LEVEL);
+        KCustomer.login(); // 어노테이션을 사용할 때 접근 방법
+        KCustomer.Companion.login(); // 위와 동일한 결과로 어노테이션을 사용하지 않을 때 접근 방법
+    }
+}
+```
+
+### object와 싱글톤
+
+내용이 조금 변경된 클래스를 만들어야 할 때 기본적으로는 상위 클래스에서 하위 클래스를 새로 선언해 변경된 내용을 기술할 수 있다. 하지만 새로 하위 클래스를 선언하지 않고 조금 변경한 객체를 생성하고 싶다면 어떻게 해야할 까? 코틀린에서는 object 표현식이나 선언으로 좀 더 쉽게 처리할 수 있다.
+
+```kotlin
+// ObjectDeclaration.kt
+package chap06.section3
+
+object OCustomer {
+    var name = "Kildong"
+    fun greeting() = println("Hello World!")
+    val HOBBY = Hobby("Basketball")
+    init {
+        println("Init!")
+    }
+}
+
+class CCustomer {
+    companion object {
+        const val HELLO = "hello" // 상수 표현
+        var name = "Joosol"
+        @JvmField val HOBBY = Hobby("Football")
+        @JvmStatic fun greeting() = println("Hello World!")
+    }
+}
+
+class Hobby(val name: String)
+
+fun main() {
+    OCustomer.greeting() // 객체의 접근 시점
+    OCustomer.name = "Dooly"
+    println("name = ${OCustomer.name}")
+    println(OCustomer.HOBBY.name)
+
+    CCustomer.greeting()
+    println("name = ${CCustomer.name}, HELLO = ${CCustomer.HELLO}")
+    println(CCustomer.HOBBY.name)
+}
+```
+
+object로 선언된 OCustomer는 멤버 프로퍼티와 객체 생성 없이 이름의 점(.) 표기법으로 바로 사용할 수 있다. object 선언 방식을 사용하면 접근 시점에 객체가 생성되고, 생성자 호출을 하지 않기 때문에 object 선언에는 주 생성자와 부 생성자를 사용할 수 없다. object 선언에서도 클래스나 인터페이스를 상속할 수 있다.
+
+  만약, 자바에서 object 선언으로 생성된 인스턴스에 접근하려면 INSTANCE를 사용한다.
+
+### object 표현식
+
+- object 표현식은 object 선언과 달리 이름이 없으며 싱글톤이 아니다. 따라서 object 표현식이 사용될 때마다 새로운 인스턴스가 생성된다.
+- object 표현식을 이용하면 하위 클래스를 만들지 않고도 클래스의 특정 메서드를 오바리이딩 할 수 있다.
+
+```kotlin
+// ObjectExpressionSuperMan.kt
+package chap06.section3
+
+open class Superman() {
+    fun work() = println("Taking photos")
+    fun talk() = println("Talking with people.")
+    open fun fly() = println("Flying in the air.")
+}
+
+fun main() {
+    val pretendedMan = object : Superman() {
+        override fun fly() = println("I'm not a real superman. I can't fly!")
+    }
+    pretendedMan.work()
+    pretendedMan.talk()
+    pretendedMan.fly()
+
+}
+```
+
+---
+
+<aside>
+✅ 체크 리스트
+
+- [x]  2시간 이상 공부하셨나요?
+- [ ]  내용을 정확히 이해했나요?
+- [x]  코드에 주석은 달았나요?
+</aside>
+
+[Kotlin-Study/9일차 at main · ghdcksgml1/Kotlin-Study](https://github.com/ghdcksgml1/Kotlin-Study/tree/main/9%EC%9D%BC%EC%B0%A8)
